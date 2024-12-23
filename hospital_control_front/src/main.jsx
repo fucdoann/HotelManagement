@@ -4,6 +4,7 @@ import App from './App.jsx'
 import { AuthProvider } from './Context/AuthProvider.jsx'
 import { ThemeProvider } from "@material-tailwind/react";
 import { MaterialTailwindControllerProvider } from "./Context";
+import { NotificationProvider } from './Context/NotificationContext.jsx';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import './index.css'
@@ -14,7 +15,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <ThemeProvider>
         <MaterialTailwindControllerProvider>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <NotificationProvider>
           <App />
+          </NotificationProvider>
           </LocalizationProvider>
         </MaterialTailwindControllerProvider>
       </ThemeProvider>

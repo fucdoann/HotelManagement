@@ -12,6 +12,7 @@ import Error from './Views/404'
 import UserDasboard from './Views/User/UserDashboard'
 import ProtectedRoute from './ProtectedRoute'
 import ListBook from './Views/User/UserBookList'
+import ListPay from './Views/User/UserPayList'
 // import {AdminLayout} from './Views/AdminDashboard'
 import { Home, Profile, Tables, Bookings, FormElements, Payments, EditHotel } from "./Views/AdminDashboard";
 import { useAuth } from './Context/AuthProvider'
@@ -32,7 +33,7 @@ function App() {
                 {/* Catch-all route for undefined paths */}
                 <Route path="*" element={<Error />} />
                 {/* Admin router */}
-                <Route exact path='/admin' element={<ProtectedRoute roles={['user']}></ProtectedRoute>}>
+                <Route exact path='/admin' element={<ProtectedRoute roles={['admin']}></ProtectedRoute>}>
                     <Route exact path='/admin' element={<AdminDashboard />}>
                         <Route path="home" element={<Home></Home>}></Route>
                         <Route path="profile" element={<Profile></Profile>}></Route>
@@ -44,7 +45,7 @@ function App() {
                     </Route>
                 </Route>
                 {/* Hotel router */}
-                <Route exact path='/hotel' element={<ProtectedRoute roles={['user']}></ProtectedRoute>}>
+                <Route exact path='/hotel' element={<ProtectedRoute roles={['user','admin']}></ProtectedRoute>}>
                     {/* Use a relative path for child routes */}
                     <Route index element={<UserBookPage />} /> {/* Default child route */}
                     <Route path="searchresult" element={<SearchResult />} />
@@ -54,10 +55,11 @@ function App() {
 
 
                 </Route>
-                <Route exact path='/user' element={<ProtectedRoute roles={['user']}></ProtectedRoute>}>
+                <Route exact path='/user' element={<ProtectedRoute roles={['user','admin']}></ProtectedRoute>}>
                     {/* Use a relative path for child routes */}
                     <Route index element={<UserDasboard />} /> {/* Default child route */}
                     <Route path="listbook" element={<ListBook />} />
+                    <Route path="listpay" element={<ListPay />} />
 
 
                 </Route>

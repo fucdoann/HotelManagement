@@ -207,7 +207,7 @@ const BookingDetails = () => {
             });
             const status = response.data.status;
             if(status == 201){
-                navigate('/');
+                navigate('/user/listbook');
             }else{
                 setFailPop(true);
             }
