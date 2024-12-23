@@ -99,7 +99,7 @@ export default function UsetrSidebar({active}){
                         <div className="overflow-hidden">
                             <div className="block w-full py-1 font-sans text-sm antialiased font-light leading-normal text-gray-700">
                                 <nav className="flex min-w-[240px] flex-col gap-1 p-0 font-sans text-base font-normal text-blue-gray-700">
-                                    <div role="button"
+                                    <div role="button" onClick={() => navigate('/user/listbook')}
                                         className={"flex items-center w-full p-3 leading-tight transition-all rounded-lg outline-none text-start hover:bg-blue-gray-50 hover:bg-opacity-80 hover:text-blue-gray-900 focus:bg-blue-gray-50 focus:bg-opacity-80 focus:text-blue-gray-900 active:bg-blue-gray-50 active:bg-opacity-80 active:text-blue-gray-900" + (active === 'listbook' ? ' bg-blue-gray-50 bg-opacity-80 text-blue-gray-900' : '')}>
                                         <div className="grid mr-4 place-items-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="3"

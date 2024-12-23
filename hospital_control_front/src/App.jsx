@@ -13,7 +13,7 @@ import UserDasboard from './Views/User/UserDashboard'
 import ProtectedRoute from './ProtectedRoute'
 import ListBook from './Views/User/UserBookList'
 // import {AdminLayout} from './Views/AdminDashboard'
-import { Home, Profile, Tables, Notifications, FormElements } from "./Views/AdminDashboard";
+import { Home, Profile, Tables, Bookings, FormElements, Payments, EditHotel } from "./Views/AdminDashboard";
 import { useAuth } from './Context/AuthProvider'
 import { AdminDashboard } from './layouts/dashboard'
 function App() {
@@ -36,8 +36,10 @@ function App() {
                     <Route exact path='/admin' element={<AdminDashboard />}>
                         <Route path="home" element={<Home></Home>}></Route>
                         <Route path="profile" element={<Profile></Profile>}></Route>
-                        <Route path="tables" element={<Tables></Tables>}></Route>
-                        <Route path="notifications" element={<Notifications></Notifications>}></Route>
+                        <Route path="hotels" element={<Tables></Tables>}></Route>
+                        <Route path="bookings" element={<Bookings></Bookings>}></Route>
+                        <Route path="payments" element={<Payments></Payments>}></Route>
+                        <Route path="edithotel" element={<EditHotel />} />
                         <Route path="addhotel" element={<FormElements />} />
                     </Route>
                 </Route>

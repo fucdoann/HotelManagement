@@ -1,4 +1,4 @@
-export default function SuccessPopUp({props}) {    
+export default function SuccessPopUp({main_mess, mess}) {    
     return (
         <div className="z-50 bg-gray-800 bg-opacity-50   fixed left-1/2 top-[50%] transform -translate-x-1/2 -translate-y-16 rounded shadow-md transition-transform duration-500">
       <div className="container">
@@ -30,10 +30,10 @@ export default function SuccessPopUp({props}) {
           </div>
           <div className="w-full">
             <h5 className="mb-3 text-lg font-semibold text-[#004434]">
-              {props.main_mess}
+              {main_mess}
             </h5>
             <p className="text-base leading-relaxed text-body-color">
-            {props.mess}
+            {mess}
             </p>
           </div>
         </div>

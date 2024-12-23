@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { Cog6ToothIcon } from "@heroicons/react/24/solid";
 import { IconButton } from "@material-tailwind/react";
 import { Outlet } from "react-router-dom";
+import { useState } from "react";
 import {
   Sidenav,
   DashboardNavbar,
@@ -14,7 +15,7 @@ import { useMaterialTailwindController, setOpenConfigurator } from "../Context";
 export function AdminDashboard() {
   const [controller, dispatch] = useMaterialTailwindController();
   const { sidenavType } = controller;
-
+  
   return (
     <div className="min-h-screen bg-blue-gray-50/50">
       <Sidenav
@@ -37,7 +38,6 @@ export function AdminDashboard() {
         </IconButton>
        <Outlet/>
         <div className="text-blue-gray-600">
-          <Footer />
         </div>
       </div>
     </div>

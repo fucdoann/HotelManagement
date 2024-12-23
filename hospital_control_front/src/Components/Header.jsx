@@ -45,9 +45,9 @@ import AccountDropdown from "./UserDropDown"
                 } `}
               >
                 <ul className="block lg:flex">
-                  <ListItem NavLink="/#">Home</ListItem>
-                  <ListItem NavLink="/#">Payment</ListItem>
-                  <ListItem NavLink="/#">About</ListItem>
+                  <ListItem NavLink="/#">Trang chủ</ListItem>
+                  <ListItem NavLink="/#">Thanh toán</ListItem>
+                  <ListItem NavLink="/#">Về chúng tôi</ListItem>
                   <ListItem NavLink="/#">Blog</ListItem>
                 </ul>
               </nav>

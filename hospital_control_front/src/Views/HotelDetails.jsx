@@ -40,8 +40,8 @@ const HotelDetail = () => {
                     }
                 })
                 .then(hotelWithConve => {
-                    console.log(hotelWithConve);
                     setHotel(hotelWithConve);
+                    console.log(hotelWithConve);
                 })
                 .catch((error) => {
                     console.error("Error fetching hotel details:", error);
@@ -78,7 +78,7 @@ const HotelDetail = () => {
             <Overview hotel={hotel} setOpenDetail={setOpenDetail} setCurrentIndex={setCurrentIndex} />
             <RoomsTable rooms={rooms} hotel_id={hotel_id} />
             {openDetail && <ImageSlider hotel={hotel} setOpenDetail={setOpenDetail} setCurrentIndex={setCurrentIndex} currentIndex={currentIndex} />}
-            <HotelRules />
+            <HotelRules hotel={hotel}/>
             <CommentHotel />
         </>
     )

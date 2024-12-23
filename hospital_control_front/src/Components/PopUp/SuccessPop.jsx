@@ -1,5 +1,14 @@
 import { useEffect } from "react";
 import React from "react";
+const convertClass = (status) => {
+  if (status === 'Confirmed') {
+      return 'text-green-900 bg-green-200'
+  } else if (status === 'Paying') {
+      return 'text-orange-900 bg-orange-200 '
+  } else {
+      return 'text-red-900 bg-red-200 '
+  }
+}
 export default function SuccessPop({mess, onClose}){
      useEffect(() => {
         const timer = setTimeout(() => {
@@ -12,7 +21,7 @@ export default function SuccessPop({mess, onClose}){
         <section className="bg-gray-2 fixed z-50 top-4 right-4 transition-transform duration-500 ease-in-out transform translate-x-0">
       <div className="mx-auto px-4 sm:container">
         <div className="flex justify-end">
-          <div className="relative flex w-full max-w-[460px] items-center rounded-lg border border-[#3758F9] bg-[#3758F90D] px-5 py-[18px]">
+          <div className="relative flex w-full max-w-[460px] items-center rounded-lg border border-[#3758F9] bg-white px-5 py-[18px]">
             <span className="mr-4 flex h-[30px] w-full max-w-[30px] items-center justify-center rounded-full bg-[#3758F9]">
               <svg
                 width={16}

@@ -6,7 +6,7 @@ export default function AccountDropdown1() {
   const {logout } = useAuth()
   const trigger = useRef(null);
   const dropdown = useRef(null);
-
+  const {user} = useAuth();
   // close on click outside
   useEffect(() => {
     const clickHandler = ({ target }) => {
@@ -44,7 +44,7 @@ export default function AccountDropdown1() {
               onClick={() => setDropdownOpen(!dropdownOpen)}
               className="mb-3.5 inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-stroke bg-white px-6 py-3 text-base font-medium text-dark dark:border-dark-3 dark:bg-dark-2 dark:text-white"
             >
-              Account
+              Tài khoản
               <span
                 className={`duration-100 ${dropdownOpen ? "-scale-y-100" : ""}`}
               >
@@ -66,7 +66,7 @@ export default function AccountDropdown1() {
               ref={dropdown}
               onFocus={() => setDropdownOpen(true)}
               onBlur={() => setDropdownOpen(false)}
-              className={`absolute right-0 top-full w-[240px] divide-y divide-stroke overflow-hidden rounded-lg bg-white dark:divide-dark-3 dark:bg-dark-2 ${dropdownOpen ? "block" : "hidden"}`}
+              className={`absolute right-0 top-full w-[240px] divide-y divide-stroke overflow-hidden rounded-lg bg-white shadow-lg dark:divide-dark-3 dark:bg-dark-2 ${dropdownOpen ? "opacity-100 scale-100 translate-y-2" : "opacity-0 scale-95 translate-y-0 pointer-events-none"}`}
             >
               <div className="flex items-center gap-3 px-4 py-3">
                 <div className="relative aspect-square w-10 rounded-full">
@@ -79,83 +79,38 @@ export default function AccountDropdown1() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-dark dark:text-white">
-                    Andrio Miller
+                    {user.name}
                   </p>
                   <p className="text-sm text-body-color dark:text-dark-6">
-                    miller@company.com
+                    {user.email}
                   </p>
                 </div>
               </div>
               <div>
                 <a
-                  href="#0"
+                  href="/user"
                   className="flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium text-dark hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
                 >
-                  View profile
-                </a>
-                <a
-                  href="#0"
-                  className="flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium text-dark hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
-                >
-                  Settings
-                </a>
-                <a
-                  href="#0"
-                  className="flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium text-dark hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
-                >
-                  Keyboard shortcuts
-                  <span className="text-xs text-dark-5"> ⌘K </span>
+                  Hồ sơ cá nhân
                 </a>
               </div>
               <div>
                 <a
-                  href="#0"
+                  href="/user/listbook"
                   className="flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium text-dark hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
                 >
-                  Company profile
+                  Khách sạn đã đặt
                 </a>
                 <a
                   href="#0"
                   className="flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium text-dark hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
                 >
-                  Team
-                </a>
-                <a
-                  href="#0"
-                  className="flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium text-dark hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
-                >
-                  Invite colleagues
-                </a>
-              </div>
-              <div>
-                <a
-                  href="#0"
-                  className="flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium text-dark hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
-                >
-                  Changelog
-                </a>
-                <a
-                  href="#0"
-                  className="flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium text-dark hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
-                >
-                  Slack Community
-                </a>
-                <a
-                  href="#0"
-                  className="flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium text-dark hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
-                >
-                  Support
-                </a>
-                <a
-                  href="#0"
-                  className="flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium text-dark hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
-                >
-                  API
+                  Thông tin thanh toán
                 </a>
               </div>
               <div>
                 <button onClick={logout}  className="flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium text-dark hover:bg-gray-50 dark:text-white dark:hover:bg-white/5">
-                  Log out
+                  Đăng xuất
                 </button>
               </div>
             </div>

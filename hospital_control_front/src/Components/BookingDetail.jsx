@@ -25,6 +25,7 @@ function formatTimestampToVietnamese(timestamp) {
 
     // Return the combined result
     return `${dayOfWeek}, ${formattedDate}`;
+    return timestamp;
 }
 function calculateDaysBetween(timestamp1, timestamp2) {
     // Number of milliseconds in a day
@@ -49,8 +50,8 @@ const BookingDetails = () => {
     } = useForm()
     const [nameLocaiton, setNameLocation] = useState('Việt Nam');
     const [roomData, setRoomData] = useState(location.state || {});
-    const [checkin, setCheckin] = useState('');
-    const [checkout, setCheckout] = useState('');
+    const [checkin, setCheckin] = useState(new Date());
+    const [checkout, setCheckout] = useState(new Date());
     const [numRoom, setNumRoom] = useState(1);
     const [children, setChildren] = useState(0);
     const [adults, setAdults] = useState(0);
@@ -76,6 +77,7 @@ const BookingDetails = () => {
     };
     useEffect(() => {
         setRoomData(location.state || {});
+        console.log(location.state)
     }, [location]);
     const [hotelName, setHotelName] = useState('');
     const fetchData = async (type, id) => {
@@ -107,8 +109,8 @@ const BookingDetails = () => {
         setNumRoom(roomData.rooms);
         setAdults(roomData.adults);
         setChildren(roomData.children);
-        setCheckin(formatTimestampToVietnamese(roomData.checkin));
-        setCheckout(formatTimestampToVietnamese(roomData.checkout));
+        setCheckin((roomData.checkin));
+        setCheckout((roomData.checkout));
         setNight(calculateDaysBetween(roomData.checkin, roomData.checkout))
         const hotel_id = roomData.hid
         axios.post('/detailHotel', { hotel_id })
@@ -254,11 +256,11 @@ const BookingDetails = () => {
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-gray-700">
                                     <div>
                                         <p className="font-semibold">Ngày nhận phòng</p>
-                                        <p className="text-sm">{checkin}</p>
+                                        <p className="text-sm">{formatTimestampToVietnamese(checkin)}</p>
                                     </div>
                                     <div>
                                         <p className="font-semibold">Ngày trả phòng</p>
-                                        <p className="text-sm">{checkout}</p>
+                                        <p className="text-sm">{formatTimestampToVietnamese(checkout)}</p>
                                     </div>
                                     <div>
                                         <p className="font-semibold">Tổng thời gian lưu trú</p>
@@ -421,8 +423,8 @@ const BookingDetails = () => {
                         <div>
                             <h2 className="text-lg font-bold mb-4">Chi tiết đặt phòng của bạn</h2>
                             <p>
-                                <strong>Nhận phòng:</strong> {checkin}<br />
-                                <strong>Trả phòng:</strong>{checkout}<br />
+                                <strong>Nhận phòng:</strong> {formatTimestampToVietnamese(checkin)}<br />
+                                <strong>Trả phòng:</strong>{formatTimestampToVietnamese(checkout)}<br />
                                 <strong>Tổng cộng:</strong>{' '}
                                 <span className="text-green-600 font-semibold">US${prices}</span>
                             </p>

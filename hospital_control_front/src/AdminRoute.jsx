@@ -6,8 +6,7 @@ import {
   ServerStackIcon,
   RectangleStackIcon,
 } from "@heroicons/react/24/solid";
-import { Home, Profile, Tables, Notifications,FormElements } from "./Views/AdminDashboard";
-import { SignIn, SignUp } from "./Views/auth";
+import { Home, Profile, Tables, Bookings,FormElements,Payments } from "./Views/AdminDashboard";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -19,51 +18,39 @@ export const routes = [
     pages: [
       {
         icon: <HomeIcon {...icon} />,
-        name: "dashboard",
+        name: "Thống kê tổng quan",
         path: "/home",
         element: <Home />,
       },
       {
         icon: <UserCircleIcon {...icon} />,
-        name: "profile",
+        name: "Thông tin cá nhân",
         path: "/profile",
         element: <Profile />,
       },
       {
         icon: <TableCellsIcon {...icon} />,
-        name: "tables",
-        path: "/tables",
+        name: "Khách sạn",
+        path: "/hotels",
         element: <Tables />,
       },
       {
-        icon: <InformationCircleIcon {...icon} />,
-        name: "notifications",
-        path: "/notifications",
-        element: <Notifications />,
-      },
-      {
-        icon: <InformationCircleIcon {...icon} />,
-        name: "formHotel",
-        path: "/addHotel",
-        element: <FormElements />,
-      },
-    ],
-  },
-  {
-    title: "hotel control",
-    layout: "auth",
-    pages: [
-      {
         icon: <ServerStackIcon {...icon} />,
-        name: "sign in",
-        path: "/sign-in",
-        element: <SignIn />,
+        name: "Đơn đặt phòng",
+        path: "/bookings",
+        element: <Bookings />,
       },
       {
         icon: <RectangleStackIcon {...icon} />,
-        name: "sign up",
-        path: "/sign-up",
-        element: <SignUp />,
+        name: "Đơn thanh toán",
+        path: "/payments",
+        element: <Payments />,
+      },
+      {
+        icon: <InformationCircleIcon {...icon} />,
+        name: "Thêm khách sạn",
+        path: "/addHotel",
+        element: <FormElements />,
       },
     ],
   },

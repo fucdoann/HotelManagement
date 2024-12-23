@@ -98,17 +98,18 @@ const Overview = ({ hotel = { images: [] }, setOpenDetail, setCurrentIndex }) =>
 
           {/* Details Section */}
           <div className="lg:w-1/3 space-y-4">
-            <h1 className="text-2xl font-bold">Dear House near Bãi Sau beach</h1>
-            <p className="text-gray-500">139/18 Phan Chu Trinh, Vũng Tàu, Việt Nam</p>
+            <h1 className="text-2xl font-bold">{hotel.name}</h1>
+            <p className="text-gray-500">{hotel.address}, {hotel.location}, Việt Nam</p>
             <div className="flex items-center gap-2">
-              <span className="text-xl font-semibold text-blue-600">8.5</span>
-              <p className="text-gray-600">Rất tốt · 244 đánh giá</p>
+              <span className="text-xl font-semibold text-blue-600">{hotel.star_rating}</span>
+              <p className="text-gray-600">Khá tệ · 0 đánh giá</p>
             </div>
             <div className="bg-blue-50 p-4 rounded">
               <p className="font-bold">Điểm nổi bật của chỗ nghỉ</p>
               <ul className="text-gray-600 text-sm list-disc pl-4">
-                <li>Hoàn hảo cho kỳ nghỉ 2 đêm!</li>
-                <li>Vị trí rất được yêu thích</li>
+                {hotel.hot_conve && hotel.hot_conve.map((item, index) => (
+                  <li key ={index}>{item}</li>          
+                ))}
               </ul>
             </div>
             <button className="w-full bg-blue-600 text-white py-2 rounded">Đặt ngay</button>
@@ -127,7 +128,7 @@ const Overview = ({ hotel = { images: [] }, setOpenDetail, setCurrentIndex }) =>
         <section className="mt-8">
           <h2 className="text-xl font-semibold mb-2">Các tiện nghi được ưa chuộng nhất</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {hotel.conveniences.map((item, index) => (
+            {hotel && hotel.conveniences && hotel.conveniences.map((item, index) => (
               <div key={index} className="flex items-center gap-2">
                 <SvgIcon svgString={item.convenient_icon_svg} />
                 <p className="text-gray-700">{item.convenient_name}</p>

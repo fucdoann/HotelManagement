@@ -5,7 +5,6 @@ import Dropdown from "../../Components/Admin/Dropdown";
 import SuccessPop from "../../Components/PopUp/SuccessPop";
 import ConfirmDelete from "../../Components/Admin/ConfirmDelete";
 import { Input, Button, SendIcon } from "@material-tailwind/react";
-import { useNavigate } from "react-router-dom";
 const convertTime = (time) => {
   const date = new Date(time);
 
@@ -20,18 +19,20 @@ const convertTime = (time) => {
   return `${hours}h${minutes} ${month} ${day}, ${year}`;
 }
 const convertClass = (status) => {
-  if (status === 'Available') {
-    return 'text-green-900 bg-green-200'
+  if (status === 'confirmed') {
+      return 'text-green-900 bg-green-200'
+  } else if (status === 'Paying') {
+      return 'text-orange-900 bg-orange-200 '
+  } else {
+      return 'text-red-900 bg-red-200 '
   }
-  return 'text-red-900 bg-red-200 '
 }
-export function Tables() {
-  const navigate = useNavigate();
+export function Payments() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [message, setMessage] = useState('');
   const [index, setIndex] = useState(0);
-  const [listHotel, setListHotel] = useState([]);
+  const [listPayment, setListPayment] = useState([]);
   const [countIndex, setCountIndex] = useState(10);
   const [querySearch, setQuerySearch] = useState('');
   const [deleteId, setDeleteId] = useState(0);
@@ -46,9 +47,9 @@ export function Tables() {
   };
   // Function to fetch bookings
   const fetchHotels = () => {
-    axios.post('/getListHotel', { querySearch })
+    axios.post('/getListPayments', { querySearch })
       .then(res => {
-        setListHotel(res.data.data);
+        setListPayment(res.data.data);
         setCountIndex(res.data.data.length);
       })
       .catch(error => {
@@ -91,9 +92,6 @@ export function Tables() {
         console.error(error);
       });
   }
-  const EditHotel = (hotel_id) => {
-    navigate(`/admin/edithotel?id=${hotel_id}`);
-  }
   return (
     <>
       {showDelete && <ConfirmDelete setShowDelete={setShowDelete} deleteHotel={deleteHotel} deleteId={deleteId} />}
@@ -118,19 +116,23 @@ export function Tables() {
                     <tr>
                       <th
                         className="w-[11%] px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        ID khách sạn
+                        ID payment
                       </th>
                       <th
                         className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Tên khách sạn
+                         ID booking
                       </th>
                       <th
                         className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Thời gian tạo
+                        Tên người thanh toán
                       </th>
                       <th
                         className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Giá tối thiểu
+                        Số tiền thanh toán
+                      </th>
+                      <th
+                        className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Thời gian thanh toán
                       </th>
                       <th
                         className="w-[10%] px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -143,27 +145,35 @@ export function Tables() {
                     </tr>
                   </thead>
                   <tbody>
-                    {listHotel.length > 0 && listHotel.slice(index * 10, index * 10 + 10).map((item, index) => (
+                    {listPayment.length > 0 && listPayment.slice(index * 10, index * 10 + 10).map((item, index) => (
                       <tr key={index}>
                         <td className="px-3 py-5 border-b border-gray-200 bg-white text-sm">
-                          <p className="text-gray-900 whitespace-no-wrap flex items-center justify-center">{item.hotel_id}</p>
+                          <p className="text-gray-900 whitespace-no-wrap flex items-center justify-center">{item.id}</p>
                         </td>
                         <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                           <div className="flex items-center">
                             <div className="ml-3">
                               <p className="text-gray-900 whitespace-no-wrap">
-                                {item.name}
+                                {item.booking_id}
                               </p>
                             </div>
                           </div>
                         </td>
                         <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                          <p className="text-gray-900 whitespace-no-wrap">{convertTime(item.created_at)}</p>
+                          <p className="text-gray-900 whitespace-no-wrap">{item.booking_name}</p>
                         </td>
                         <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                           <p className="text-gray-900 whitespace-no-wrap">
-                            {item.min_price} vnd
+                            {item.amount} vnd
                           </p>
+                        </td>
+                        <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                          <span
+                            className={"relative rounded-full inline-block px-3 py-1 font-semibold leading-tight "}>
+                            <span aria-hidden
+                              className="absolute inset-0  opacity-50 rounded-full"></span>
+                            <span className="relative">{convertTime(item.created_at)}</span>
+                          </span>
                         </td>
                         <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                           <span
@@ -174,7 +184,7 @@ export function Tables() {
                           </span>
                         </td>
                         <td className="relative px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                          <Dropdown id={item.hotel_id} status={item.status} EditHotel={EditHotel} setDeleteId={setDeleteId} setShowDelete={setShowDelete} activeHotel={activeHotel} />
+                          <Dropdown id={item.booking_id} status={item.status} setDeleteId={setDeleteId} setShowDelete={setShowDelete} activeHotel={activeHotel} />
                         </td>
                       </tr>
                     ))}
@@ -183,7 +193,7 @@ export function Tables() {
                 <div
                   className="px-5 py-5 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between          ">
                   <span className="text-xs xs:text-sm text-gray-900">
-                    Hiển thị {index * 10 + 1} -  {Math.min(index * 10 + 10, countIndex)} trong tổng số {countIndex} khách sạn
+                    Hiển thị {index * 10 + 1} -  {Math.min(index * 10 + 10, countIndex)} trong tổng số {countIndex} hóa đơn thanh toán
                   </span>
                   <div className="inline-flex mt-2 xs:mt-0">
                     <button onClick={() => handlePrev()}
@@ -207,4 +217,4 @@ export function Tables() {
   );
 }
 
-export default Tables;
+export default Payments;

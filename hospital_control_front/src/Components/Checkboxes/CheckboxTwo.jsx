@@ -15,9 +15,8 @@ const CheckboxTwo = (props) => {
         props.setArrayConveHotel(array)
       }
       else {
-        const index = array.indexOf(conveId)
-        array.splice(index, 1)
-        props.setArrayConveHotel(array)
+        const  updatedArray  = array.filter((item) => item !== conveId);
+        props.setArrayConveHotel(updatedArray)
       }
     }
     else{
@@ -29,9 +28,8 @@ const CheckboxTwo = (props) => {
         props.setArrayConveHotel(array)
       }
       else {
-        const index = array.indexOf(conveId)
-        array[indexConve].splice(index, 1)
-        props.setArrayConveHotel(array)
+        const  updatedArray  = array.filter((item) => item !== conveId);
+        props.setArrayConveHotel(updatedArray)
       }
     }
   }, [isChecked])

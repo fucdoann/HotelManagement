@@ -139,15 +139,18 @@ const RoomDetail = ({ room_id,setShowRoom }) => {
                             {room.description}
                         </p>
 
-                        <h3 className="font-semibold text-gray-900 mt-4">Tiện nghi phòng tắm riêng của bạn:</h3>
+                        <h3 className="font-semibold text-gray-900 mt-4">Tiện nghi phòng riêng của bạn:</h3>
                         <ul className="list-disc ml-6 mt-2">
+                            {room.convenient && room.convenient.map((item, index) => (
+                                <li key={index} className="text-gray-700">{item}</li>
+                            ))}
                             <li className="text-gray-700">Đồ vệ sinh cá nhân miễn phí</li>
                             <li className="text-gray-700">Vòi sen</li>
                             <li className="text-gray-700">Chậu rửa vệ sinh (bidet)</li>
                         </ul>
 
                         <h3 className="font-semibold text-gray-900 mt-4">Hướng tầm nhìn:</h3>
-                        <p className="text-gray-700">Nhìn ra vườn</p>
+                        <p className="text-gray-700">{room.view_room}</p>
 
                         <h3 className="font-semibold text-gray-900 mt-4">Tiện nghi:</h3>
                         <ul className=" ml-6 mt-2">
@@ -162,7 +165,7 @@ const RoomDetail = ({ room_id,setShowRoom }) => {
                         <p className="text-gray-700">Không hút thuốc</p>
 
                         <div className="flex justify-between items-center mt-6">
-                            <p className="text-lg font-semibold text-gray-900">US${room.price_per_night} cho 1 đêm</p>
+                            <p className="text-lg font-semibold text-gray-900">VND {room.price_per_night} cho 1 đêm</p>
                             <button className="bg-green-500 text-white px-4 py-2 rounded-lg">Đặt ngay</button>
                         </div>
                     </div>

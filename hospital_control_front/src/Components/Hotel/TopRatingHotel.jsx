@@ -61,14 +61,14 @@ export default function TopRatingHotel() {
   }, [])
   return (
     <div className="mt-8 px-4 py-8 flex justify-center items-center flex-col">
-      <h2 className="text-2xl font-semibold mb-4">Các khách sạn được đánh giá tốt trên trang chúng tôi</h2>
+      <h2 className="text-3xl font-semibold mb-6 text-center text-gray-800">Các khách sạn được đánh giá tốt trên trang chúng tôi</h2>
       <div className="flex gap-4 w-8/12">
       {topHotel.map((item) => (
-        <div key={item.hotel_id} className="w-4/12 bg-white rounded-lg shadow-lg overflow-hidden">
+        <div key={item.hotel_id} className="w-4/12 bg-white rounded-lg shadow-xl overflow-hidden hover:scale-105 transform transition-all duration-300">
           <img
             src={`${item.images.length  ?  baseUrl + item.images[0] :'https://as2.ftcdn.net/v2/jpg/07/91/22/59/1000_F_791225927_caRPPH99D6D1iFonkCRmCGzkJPf36QDw.jpg'}`}
             alt="Hotel"
-            className="w-full h-40 object-cover"
+            className="w-full h-48 object-cover  rounded-t-lg"
           />
           <div className="p-4">
             <h3 className="text-xl font-semibold">{item.name}</h3>
@@ -79,8 +79,9 @@ export default function TopRatingHotel() {
               ))}
 
             </div>
-            <button onClick={() => {navigate(`/hotel/detail?id=${item.hotel_id}`)}} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg">
-              Check prices
+            <button
+            onClick={() => {navigate(`/hotel/detail?id=${item.hotel_id}`)}} className="mt-6 w-full bg-blue-600 text-white py-3 rounded-lg text-lg font-semibold transition-all duration-200 hover:bg-blue-700">
+              Xem giá phòng
             </button>
           </div>
         </div>

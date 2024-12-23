@@ -5,6 +5,7 @@ import CheckboxTwo from '../../Components/Checkboxes/CheckboxTwo';
 import SuccessPopUp from "../../Components/SuccessPopUp";
 import { useForm } from "react-hook-form";
 import { useAuth } from '../../Context/AuthProvider';
+import { useNavigate } from "react-router-dom";
 
 const getConvenient = async (type) => {
   if (localStorage.getItem('token')) {
@@ -35,6 +36,7 @@ const checkExist = (array, index) => {
   return true;
 }
 export function FormElements() {
+  const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState('');
   const [focusPlace, setFocusPlace] = useState(false);
   const [flagChange, setFlagChanghe] = useState(false);
@@ -44,6 +46,7 @@ export function FormElements() {
   const [arrayConveHotel, setArrayConveHotel] = useState([]);
   const [arrayConveRoom, setArrayConveRoom] = useState([[]]);
   const [nameActiveRoom, setRoomName] = useState('');
+  const [checkPay, setCheckPay] = useState(false);
   const dropdownRef = useRef(null);
   const [rooms, setRooms] = useState([{}])
   const [activeRoom, setActiveRoom] = useState(0);
@@ -121,7 +124,10 @@ export function FormElements() {
     roomForm.setValue("price_per_night", rooms[activeRoom].price_per_night);
     roomForm.setValue("guest_count", rooms[activeRoom].guest_count);
     roomForm.setValue("area", rooms[activeRoom].area);
-    roomForm.setValue("convenient", rooms[activeRoom].convenient);
+    roomForm.setValue("view_room", rooms[activeRoom].view_room);
+    roomForm.setValue("room_count", rooms[activeRoom].room_count);
+    roomForm.setValue("room_rule", rooms[activeRoom].room_rule);
+    roomForm.setValue("convenient", rooms[activeRoom].convenient ? rooms[activeRoom].convenient.join("\n") : "");
   }, [activeRoom])
 
   const roomForm = useForm();
@@ -136,7 +142,7 @@ export function FormElements() {
   }
   const deleteRoom = (key) => {
     if (rooms.length > 1) {
-      setActiveRoom(activeRoom - 1);
+      setActiveRoom((activeRoom - 1) >= 0 ? activeRoom - 1 : 0);
       const data_room = rooms.filter((room, index) => index !== key);
       const data_converoom = arrayConveRoom.filter((room, index) => index !== key);
       setRooms(data_room);
@@ -148,8 +154,10 @@ export function FormElements() {
     if (nameActiveRoom != '') {
       data.arrayConve = arrayConveRoom[activeRoom];
       data.images = roomImages;
+      data.convenient = data.convenient.split("\n");
       const data_room = rooms;
       data_room[activeRoom] = data;
+      console.log(data_room)
       setRooms(data_room);
       setMainMess(`Upload room ${nameActiveRoom} image successfully`);
       setMess('Edit then click upload button again to reset your room image');
@@ -170,28 +178,34 @@ export function FormElements() {
     submitData.hotel.district = district
     submitData.hotel.province = province
     submitData.hotel.images = hotelImages
+    submitData.hotel.hot_conve = data.hot_conve.split("\n")
+    submitData.hotel.pay_rule = checkPay ? 1 : 0;
     submitData.room = rooms;
-
+    console.log(submitData);
     axios.post('/storeHotel', submitData).then(
       res => {
         if (res.data.status == 200) {
-          console.log(res.data)
+          navigate('/admin/hotels');
         }
         else {
-              const errorResponse = res.data.error;
-              const errorKey = Object.keys(errorResponse.error)[0]; // Get the dynamic key
-              const errorMessage = errorResponse.error[errorKey][0]; // Access the message
-              console.log(errorMessage); // Outputs: "The name has already been taken."
+          const errorResponse = res.data.error;
+          const errorKey = Object.keys(errorResponse.error)[0]; // Get the dynamic key
+          const errorMessage = errorResponse.error[errorKey][0]; // Access the message
+          console.error(errorMessage); // Outputs: "The name has already been taken."
         }
       }
     )
       .catch(error => {
+        console.log(error)
         if (error.response) {
+
           // Server responded with a status other than 2xx\
-              const errorResponse = error.response.data
-              const errorKey = Object.keys(errorResponse.error)[0]; // Get the dynamic key
-              const errorMessage = errorResponse.error[errorKey][0]; // Access the message
-              console.log(errorMessage); // Outputs: "The name has already been taken."
+          const errorResponse = error.response.data
+          const errorKey = Object.keys(errorResponse.error)[0]; // Get the dynamic key
+          const errorMessage = errorResponse.error[errorKey][0]; // Access the message
+          setMainMess('Tạo khách sạn không thành công');
+          setMess(errorMessage);
+          handleShowNotification();
         } else if (error.request) {
           // Request was made but no response received
         } else {
@@ -287,18 +301,18 @@ export function FormElements() {
             <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
               <div className="border-b border-stroke py-4 px-6 dark:border-strokedark">
                 <h3 className="font-bold text-black dark:text-white">
-                  Basic Information
+                  Thông tin cơ bản
                 </h3>
               </div>
               <div className="flex flex-col gap-5 p-6">
                 <div>
                   <label className="mb-3 text-black dark:text-white flex flex-row items-center">
-                    Hotel name
+                    Tên khách sạn
                     <div className="text-red-500 px-2 text-sm" >{hotelForm.formState.errors.name?.message}</div>
                   </label>
                   <input
                     type="text"
-                    placeholder="Default Input"
+                    placeholder="Nhập tên khách sạn"
                     value={hotelForm.watch("name")}
                     {...hotelForm.register("name", { required: "Hotel name room is required" })}
                     className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
@@ -306,7 +320,7 @@ export function FormElements() {
                 </div>
                 <div>
                   <label className="mb-3 flex flex-row items-center text-black dark:text-white">
-                    Select Type
+                    Loại khách sạn
                     <div className="text-red-500 px-2 text-sm" >{hotelForm.formState.errors.mySelect?.message}</div>
                   </label>
 
@@ -381,7 +395,7 @@ export function FormElements() {
                 </div>
                 <div>
                   <label className="mb-3 flex flex-row items-center text-black dark:text-white">
-                    Min price ($)
+                    Giá từ (vnd)
                     <div className="text-red-500 px-2 text-sm" >{hotelForm.formState.errors.min_price?.message}</div>
                   </label>
                   <input
@@ -394,14 +408,83 @@ export function FormElements() {
                       }
                     })}
                     type="number"
-                    placeholder="Active Input"
+                    placeholder="Giá phòng thấp nhất"
                     className="w-full rounded-lg border-[1.5px] border-primary bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:bg-form-input dark:text-white"
+                  />
+                </div>
+                <div>
+                  <div className='p-2'>
+                    <label
+                      htmlFor={`checkboxLabel`}
+                      className="flex cursor-pointer select-none items-center"
+                    >
+                      <div className="relative">
+                        <input
+                          type="checkbox"
+                          id={`checkboxLabel`}
+                          className="sr-only"
+                          onChange={() => {
+                            setCheckPay(!checkPay);
+                          }}
+                        />
+                        <div
+                          className={`mr-4 flex h-5 w-5 items-center justify-center rounded border ${checkPay && 'border-primary bg-gray dark:bg-transparent'
+                            }`}
+                        >
+                          <span className={`opacity-0 ${checkPay && '!opacity-100'}`}>
+                            <svg
+                              width="11"
+                              height="8"
+                              viewBox="0 0 11 8"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M10.0915 0.951972L10.0867 0.946075L10.0813 0.940568C9.90076 0.753564 9.61034 0.753146 9.42927 0.939309L4.16201 6.22962L1.58507 3.63469C1.40401 3.44841 1.11351 3.44879 0.932892 3.63584C0.755703 3.81933 0.755703 4.10875 0.932892 4.29224L0.932878 4.29225L0.934851 4.29424L3.58046 6.95832C3.73676 7.11955 3.94983 7.2 4.1473 7.2C4.36196 7.2 4.55963 7.11773 4.71406 6.9584L10.0468 1.60234C10.2436 1.4199 10.2421 1.1339 10.0915 0.951972ZM4.2327 6.30081L4.2317 6.2998C4.23206 6.30015 4.23237 6.30049 4.23269 6.30082L4.2327 6.30081Z"
+                                fill="#3056D3"
+                                stroke="#3056D3"
+                                strokeWidth="0.4"
+                              ></path>
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                      <div className='flex items-center font-semibold text-green-500' >
+                        Yêu cầu thanh toán online
+                      </div>
+                    </label>
+                  </div>
+                </div>
+                <div>
+                  <label className="mb-3 text-black dark:text-white flex flex-row items-center">
+                    Thời gian checkin
+                    <div className="text-red-500 px-2 text-sm" >{hotelForm.formState.errors.checkin_rule?.message}</div>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Ví dụ : 14:00 - 23:00"
+                    value={hotelForm.watch("checkin_rule")}
+                    {...hotelForm.register("checkin_rule", { required: "Check in time is required" })}
+                    className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  />
+                </div>
+                <div>
+                  <label className="mb-3 text-black dark:text-white flex flex-row items-center">
+                    Thời gian checkout
+                    <div className="text-red-500 px-2 text-sm" >{hotelForm.formState.errors.checkout_rule?.message}</div>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Ví dụ: 12:00"
+                    value={hotelForm.watch("checkout_rule")}
+                    {...hotelForm.register("checkout_rule", { required: "Check out time is required" })}
+                    className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                   />
                 </div>
                 <div className="w-full relative">
                   <div>
                     <label className="mb-3 flex flex-row items-center font-medium text-black dark:text-white">
-                      Location
+                      Vị trí (Tỉnh / Thành phố / Thị xã / Huyện)
                       <div className="text-red-500 px-2 text-sm" >{hotelForm.formState.errors.location?.message}</div>
                     </label>
                     <input
@@ -409,7 +492,7 @@ export function FormElements() {
                       {...hotelForm.register("location", { required: "This location is required" })}
                       onChange={(e) => { setSearchInput(e.target.value); setFlagChanghe(false) }}
                       type="text"
-                      placeholder="Disabled label"
+                      placeholder="Chọn từ danh sách hiện ra"
                       className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary dark:disabled:bg-black"
                     />
                   </div>
@@ -440,24 +523,37 @@ export function FormElements() {
                 </div>
                 <div>
                   <label className="mb-3 flex flex-row items-center text-black dark:text-white">
-                    Detail address
+                    Địa chỉ chi tiết
                     <div className="text-red-500 px-2 text-sm" >{hotelForm.formState.errors.address?.message}</div>
                   </label>
                   <input
                     {...hotelForm.register("address", { required: "Address is required" })}
                     type="text"
-                    placeholder="Active Input"
+                    placeholder="Số nhà, tên đường, phường, quận, thành phố"
                     className="w-full rounded-lg border-[1.5px] border-primary bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:bg-form-input dark:text-white"
                   />
                 </div>
                 <div>
                   <label className="mb-3 flex flex-row items-center text-black">
-                    Hotel description
+                    Điểm nổi bật của chỗ nghỉ
+                    <div className="text-red-500 px-2 text-sm" >{hotelForm.formState.errors.hot_conve?.message}</div>
+                  </label>
+                  <textarea
+                    rows={6}
+                    value={hotelForm.watch("hot_conve")}
+                    placeholder="Mỗi điểm nổi bật bạn ghi 1 dòng"
+                    {...hotelForm.register("hot_conve", { required: "Điểm nổi bật của chỗ nghỉ is required" })}
+                    className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-blue-gray-700 active:border-blue-gray-700 disabled:cursor-default disabled:bg-whiter border-form-strokedark bg-form-input focus:border-primary"
+                  ></textarea>
+                </div>
+                <div>
+                  <label className="mb-3 flex flex-row items-center text-black">
+                    Mô tả khách sạn
                     <div className="text-red-500 px-2 text-sm" >{hotelForm.formState.errors.description?.message}</div>
                   </label>
                   <textarea
                     rows={6}
-                    placeholder="Default textarea"
+                    placeholder="Mô tả chi tiết khách sạn"
                     {...hotelForm.register("description", { required: "Hotel description is required" })}
                     className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-blue-gray-700 active:border-blue-gray-700 disabled:cursor-default disabled:bg-whiter border-form-strokedark bg-form-input focus:border-primary"
                   ></textarea>
@@ -469,7 +565,7 @@ export function FormElements() {
             <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
               <div className="border-b border-stroke py-4 px-6 dark:border-strokedark">
                 <h3 className="font-medium text-black dark:text-white">
-                  Hotel convenients
+                  Tiện ích nổi bật của khách sạn
                 </h3>
               </div>
               {convenientsHotel.length > 0 && convenientsHotel ?
@@ -480,18 +576,31 @@ export function FormElements() {
                 )
               }
             </div>
+            <div>
+              <label className="mb-3 flex flex-row items-center text-black dark:text-white">
+                Yêu cầu đặt biệt
+              </label>
+              <textarea
+                name="hotel_rule"
+                value={roomForm.watch("hotel_rule")}
+                rows={5}
+                {...roomForm.register("hotel_rule")}
+                placeholder="Yêu cầu về chi phí hoàn hủy, trẻ em, ..."
+                className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary dark:disabled:bg-black"
+              ></textarea>
+            </div>
 
             {/* <!-- File upload --> */}
             <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
               <div className="border-b border-stroke py-4 px-6 dark:border-strokedark">
                 <h3 className="font-medium text-black dark:text-white">
-                  Hotel image
+                  Upload ảnh khách sạn
                 </h3>
               </div>
               <div className="flex flex-col gap-5 p-6">
                 <div>
                   <label className="mb-3 block text-black dark:text-white">
-                    Attach file
+                    Đính kèm tất cả ảnh tại đây
                   </label>
                   <input
                     type="file"
@@ -511,12 +620,12 @@ export function FormElements() {
                     />
                   ))}
                 </div>
-                <button className="font-bold bg-[#2c6657] border-[#2c6657] border rounded-full inline-flex items-center justify-center py-3 px-7 text-center text-base text-white hover:bg-[#0BB489] hover:border-[#0BB489] disabled:bg-gray-3 disabled:border-gray-3 disabled:text-dark-5" onClick={e => { e.preventDefault(); handleUpload() }}>Upload image</button>
+                <button className="w-[40%] font-bold bg-[#2c6657] border-[#2c6657] border rounded-full inline-flex items-center justify-center py-3 px-7 text-center text-base text-white hover:bg-[#0BB489] hover:border-[#0BB489] disabled:bg-gray-3 disabled:border-gray-3 disabled:text-dark-5" onClick={e => { e.preventDefault(); handleUpload() }}>Xác nhận ảnh khách sạn</button>
               </div>
             </div>
           </div>
           <button type="submit" className='mt-4 mx-auto font-bold bg-[#0c0f0e] border-[#2c6657] border rounded-xl inline-flex items-center justify-center py-3 px-7 text-center text-base text-white hover:bg-[#0BB489] hover:border-[#0BB489] disabled:bg-gray-3 disabled:border-gray-3 disabled:text-dark-5'>
-            Finish add hotel
+            Hoàn tất khách sạn
           </button>
         </form>
         <div className="flex flex-col mt-5 gap-3">
@@ -530,9 +639,9 @@ export function FormElements() {
                       <li>
                         <div className="px-4 py-5 sm:px-6">
                           <div className="flex items-center justify-between">
-                            <input type="text" disabled={key != activeRoom} onChange={(e) => setRoomName(e.target.value)} value={item.name} className="focus:border-white p-1 text-lg leading-6 font-bold text-gray-900" placeholder="Room type" />
-                            <div onClick={() => setActiveRoom(key)} className="pr-2 font-bold cursor-pointer text-indigo-600 hover:text-indigo-500">Edit</div>
-                            <div onClick={() => deleteRoom(key)} className="font-bold cursor-pointer text-red-600 hover:text-indigo-500">Delete</div>
+                            <input type="text" disabled={key != activeRoom} onChange={(e) => setRoomName(e.target.value)} value={item.name} className="focus:border-white p-1 text-lg leading-6 font-bold text-gray-900" placeholder="Tên loại phòng" />
+                            <div onClick={() => setActiveRoom(key)} className="pr-2 font-bold cursor-pointer text-indigo-600 hover:text-indigo-500">Sửa</div>
+                            <div onClick={() => deleteRoom(key)} className="font-bold cursor-pointer text-red-600 hover:text-indigo-500">Xóa</div>
 
                           </div>
                         </div>
@@ -563,7 +672,7 @@ export function FormElements() {
                     </defs>
                   </svg>
                 </span>
-                <span onClick={addMoreRoom} className="font-bold">Add rooms</span>
+                <span onClick={addMoreRoom} className="font-bold">Thêm phòng</span>
               </button>
             </div>
             <div className="flex flex-col gap-5 p-6">
@@ -574,7 +683,7 @@ export function FormElements() {
               }} className="">
                 <div>
                   <label className="mb-3 text-black dark:text-white flex flex-row items-center">
-                    Room description
+                    Mô tả phòng
                     <div className="text-red-500 px-2 text-sm" >{roomForm.formState.errors.description?.message}</div>
                   </label>
                   <textarea
@@ -589,7 +698,7 @@ export function FormElements() {
 
                 <div>
                   <label className="mb-3 text-black items-center dark:text-white flex flex-row">
-                    Room price ($)
+                    Giá phòng (vnd)
                     <div className="text-red-500 px-2 text-sm" >{roomForm.formState.errors.price_per_night?.message}</div>
                   </label>
                   <input
@@ -608,7 +717,7 @@ export function FormElements() {
                 </div>
                 <div>
                   <label className="mb-3  text-black items-center dark:text-white flex flex-row">
-                    Guests accept
+                    Số lượng khách tối đa
                     <div className="text-red-500 px-2 text-sm" >{roomForm.formState.errors.guest_count?.message}</div>
                   </label>
                   <input
@@ -626,8 +735,27 @@ export function FormElements() {
                   />
                 </div>
                 <div>
+                  <label className="mb-3  text-black items-center dark:text-white flex flex-row">
+                    Số lượng phòng
+                    <div className="text-red-500 px-2 text-sm" >{roomForm.formState.errors.room_count?.message}</div>
+                  </label>
+                  <input
+                    name="room_count"
+                    value={roomForm.watch("room_count")}
+                    type="number"
+                    {...roomForm.register("room_count", {
+                      required: "Rooms accept is required",
+                      validate: {
+                        positivePrice: value => value >= 1 || "Rooms must be greater or equal 1",
+                      }
+                    })}
+                    placeholder="Ex: 2"
+                    className="w-full rounded-lg border-[1.5px] border-primary bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:bg-form-input dark:text-white"
+                  />
+                </div>
+                <div>
                   <label className="mb-3 flex flex-row items-center text-black dark:text-white">
-                    Room area (m²)
+                    Diện tích (m²)
                     <div className="text-red-500 px-2 text-sm" >{roomForm.formState.errors.area?.message}</div>
                   </label>
                   <input
@@ -646,7 +774,23 @@ export function FormElements() {
                 </div>
                 <div>
                   <label className="mb-3 flex flex-row items-center text-black dark:text-white">
-                    Choose room convenients
+                    Hướng tầm nhìn
+                    <div className="text-red-500 px-2 text-sm" >{roomForm.formState.errors.view_room?.message}</div>
+                  </label>
+                  <input
+                    type="text"
+                    value={roomForm.watch("view_room")}
+                    name="view_room"
+                    {...roomForm.register("view_room", {
+                      required: "View room is required",
+                    })}
+                    placeholder="Ví dụ: Nhìn ra biển"
+                    className="w-full rounded-lg border-[1.5px] border-primary bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:bg-form-input dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="mb-3 flex flex-row items-center text-black dark:text-white">
+                    Tiện ích nổi bật
                   </label>
                   {convenientsRoom.length > 0 && convenientsRoom ?
 
@@ -658,7 +802,7 @@ export function FormElements() {
                 </div>
                 <div>
                   <label className="mb-3 flex flex-row items-center text-black dark:text-white">
-                    Add more convenients you have if below dont have
+                    Thêm tiện ích
                     <div className="text-red-500 px-2 text-sm" >{roomForm.formState.errors.convenient?.message}</div>
                   </label>
                   <textarea
@@ -666,7 +810,21 @@ export function FormElements() {
                     value={roomForm.watch("convenient")}
                     rows={5}
                     {...roomForm.register("convenient", { required: "Convenient room is required" })}
-                    placeholder="Each convenient is one line. Tab line to enter next convenient ( Max 10)"
+                    placeholder="Mỗi tiện ích bạn ghi 1 dòng ( Tối đa 10 )"
+                    className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary dark:disabled:bg-black"
+                  ></textarea>
+                </div>
+                <div>
+                  <label className="mb-3 flex flex-row items-center text-black dark:text-white">
+                    Yêu cầu đặt biệt
+                    <div className="text-red-500 px-2 text-sm" >{roomForm.formState.errors.convenient?.message}</div>
+                  </label>
+                  <textarea
+                    name="room_rule"
+                    value={roomForm.watch("room_rule")}
+                    rows={5}
+                    {...roomForm.register("room_rule")}
+                    placeholder="Yêu cầu về chi phí hoàn hủy, trẻ em, ..."
                     className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary dark:disabled:bg-black"
                   ></textarea>
                 </div>
@@ -675,7 +833,7 @@ export function FormElements() {
                   <div className="flex flex-col gap-5 p-6">
                     <div>
                       <label className="mb-3 block text-black dark:text-white">
-                        Room images
+                        Upload ảnh phòng
                       </label>
                       <input
                         type="file"
@@ -695,11 +853,11 @@ export function FormElements() {
                         />
                       ))}
                     </div>
-                    <button className="font-bold bg-[#2c6657] border-[#2c6657] border rounded-full inline-flex items-center justify-center py-3 px-7 text-center text-base text-white hover:bg-[#0BB489] hover:border-[#0BB489] disabled:bg-gray-3 disabled:border-gray-3 disabled:text-dark-5" onClick={e => { e.preventDefault(); handleUploadRoom() }}>Upload image</button>
+                    <button className="w-[40%] font-bold bg-[#2c6657] border-[#2c6657] border rounded-full inline-flex items-center justify-center py-3 px-7 text-center text-base text-white hover:bg-[#0BB489] hover:border-[#0BB489] disabled:bg-gray-3 disabled:border-gray-3 disabled:text-dark-5" onClick={e => { e.preventDefault(); handleUploadRoom() }}>Xác nhận ảnh phòng</button>
                   </div>
                 </div>
                 <button type="submit" className='mt-4 font-bold bg-[#0c0f0e] border-[#2c6657] border rounded-xl inline-flex items-center justify-center py-3 px-7 text-center text-base text-white hover:bg-[#0BB489] hover:border-[#0BB489] disabled:bg-gray-3 disabled:border-gray-3 disabled:text-dark-5'>
-                  Submit Room
+                  Hoàn tất tạo phòng này
                 </button>
               </form>
             </div>

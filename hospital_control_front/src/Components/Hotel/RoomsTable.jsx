@@ -5,23 +5,31 @@ import { DesktopDatePicker } from "@mui/x-date-pickers";
 import { axios } from "../../api/axios"
 import RoomDetail from "./DetailRoom";
 import dayjs from "dayjs";
-const SvgIcon = ({ svgString }) => {
-    return (
-        <div
-            dangerouslySetInnerHTML={{
-                __html: svgString,
-            }}
-        />
-    );
-};
+function formatTimestampToVietnamese(timestamp) {
+    // Create a Date object
+    const date = new Date(timestamp);
+    // Get the day of the week and map it to Vietnamese abbreviations
+    const daysOfWeek = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
+    const dayOfWeek = daysOfWeek[date.getDay()];
+
+    // Format the date using vi-VN locale
+    const formattedDate = new Intl.DateTimeFormat("vi-VN", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+    }).format(date);
+
+    // Return the combined result
+    return `${dayOfWeek}, ${formattedDate}`;
+}
 export default function RoomsTable({ rooms, hotel_id }) {
     const [roomsAvai, setRoomsAvai] = useState(rooms);
     useEffect(() => {
         setRoomsAvai(rooms)
     }, [rooms])
     const [inputRoom, setInputRoom] = useState([]); // To store input room
-    const [fromDate, setFromDate] = useState(null);
-    const [toDate, setToDate] = useState(null);
+    const [fromDate, setFromDate] = useState(dayjs());
+    const [toDate, setToDate] = useState(dayjs().add(1, 'day'));
     const [focusAdult, setFocusAdult] = useState(false);
     const [guests, setGuests] = useState(2); // initial guests
     const [adults, setAdults] = useState(2);
@@ -86,36 +94,38 @@ export default function RoomsTable({ rooms, hotel_id }) {
         const updatedValues = [...inputRoom];
         updatedValues[index] = Number(value) || 1; // Ensure it's stored as a number
         setInputRoom(updatedValues);
-      };
+    };
     // Order room
     const navigate = useNavigate();
-    const OrderRoom = (index, room_id, hotel_id) => {
+    const OrderRoom = (index, room_id) => {
+        console.log(hotel_id)
         const room = inputRoom[index];
         const roomdata = {
-            'rid' : room_id,
-            'hid' : hotel_id,
-            'rooms' : room,
-            'checkin' : fromDate.$d.getTime(),
-            'checkout' : toDate.$d.getTime(),
-            'adults' : adults,
-            'children' : children
+            'rid': room_id,
+            'hid': hotel_id,
+            'rooms': room,
+            'checkin': fromDate.$d.getTime(),
+            'checkout': toDate.$d.getTime(),
+            'adults': adults,
+            'children': children
         }
-        navigate(`/hotel/booking`, {state: roomdata});
+        // console.log(formatTimestampToVietnamese(roomdata.checkin));
+        navigate(`/hotel/booking`, { state: roomdata });
     }
 
     return (
         <>
             {showRoom && <RoomDetail setShowRoom={setShowRoom} room_id={showRoomId} />}
             <a name="rooms">
-                <div className="w-full flex justify-center flex-col pt-7 items-center">
-                    <h2 className="w-[80%] text-start font-bold text-3xl pb-4">
+                <div className="max-w-7xl mx-auto flex justify-center flex-col pt-7 items-center">
+                    <h2 className="w-full text-start font-bold text-3xl pb-4">
                         Phòng trống
                     </h2>
-                    <div className="flex flex-col items-start gap-2">
+                    <div className="flex flex-col items-start gap-2 ">
                         <p className="text-red-500 text-sm">
                             Chọn ngày để xem phòng trống và giá tại chỗ nghỉ này
                         </p>
-                        <div className="flex items-center border border-yellow-500 rounded-lg p-2 gap-2">
+                        <div className="flex items-center border border-blue-gray-700 rounded-lg p-4 gap-2">
                             {/* Date Picker */}
                             <div className="flex items-center border-r pr-2">
                                 {/* Check in date */}
@@ -154,6 +164,7 @@ export default function RoomsTable({ rooms, hotel_id }) {
                                 <DesktopDatePicker
                                     label='Check out'
                                     value={toDate}
+                                    defaultValue={dayjs().add(1, 'day')}
                                     onChange={(date) => setToDate(date)}
                                     slotProps={{
                                         layout: {
@@ -284,9 +295,9 @@ export default function RoomsTable({ rooms, hotel_id }) {
                             </button>
                         </div>
                     </div>
-                    <div className="border rounded-lg overflow-hidden shadow-lg max-w-7xl w-[80%] mb-6 mt-3">
+                    <div className="border rounded-lg overflow-hidden shadow-lg max-w-7xl  mb-6 mt-3">
                         {/* Column Titles */}
-                        <div className={`grid ${isSearch ? 'grid-cols-5' : 'grid-cols-4'} bg-blue-100 font-bold text-center text-gray-700 py-2`}>
+                        <div className={`grid ${isSearch ? 'grid-cols-5' : 'grid-cols-4'} bg-blue-300 font-bold text-center text-gray-700 py-2`}>
                             <div>Loại chỗ nghỉ</div>
                             <div>Số lượng khách</div>
                             <div>Giá cho 1 đêm</div>
@@ -297,7 +308,8 @@ export default function RoomsTable({ rooms, hotel_id }) {
                         {/* Content Rows */}
 
                         {roomsAvai.length ? roomsAvai.map((item, index) => (
-                            
+
+                            <>
                                 <div key={item.room_id} className="flex flex-col md:flex-row">
                                     <div className="p-4 flex-1 border-r">
                                         <h2 onClick={() => handleShowRoom(item.room_id)} className="font-bold text-lg text-blue-600 cursor-pointer">
@@ -309,13 +321,18 @@ export default function RoomsTable({ rooms, hotel_id }) {
                                                     <ul className="mt-2 text-sm text-gray-700 space-y-1">
                                                         <li>1 giường đôi lớn</li>
                                                         <li>🏡 {item.area}m²</li>
-                                                        {item.conveniences.length && item.conveniences.map(item => (
+                                                        {item.conveniences && item.conveniences.map(item => (
                                                             <>
-                                                                <li key={item.id} className="flex flex-row gap-2"><SvgIcon svgString={item.convenient_icon_svg} /> {item.convenient_name}</li>
+                                                                <li key={item.id} className="flex flex-row gap-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="20px"><path d="M56.33 100a4 4 0 0 1-2.82-1.16L20.68 66.12a4 4 0 1 1 5.64-5.65l29.57 29.46 45.42-60.33a4 4 0 1 1 6.38 4.8l-48.17 64a4 4 0 0 1-2.91 1.6z"></path></svg> {item.convenient_name}</li>
                                                             </>
                                                         ))}
                                                     </ul>
                                                     <ul className="mt-4 text-sm text-gray-700 space-y-1">
+                                                    {item.hot_conve && item.hot_conve.map((item, index) => (
+                                                            <>
+                                                                <li key={index} className="flex flex-row gap-2">✔️ {item.convenient_name}</li>
+                                                            </>
+                                                        ))}
                                                         <li>✔️ Đồ vệ sinh cá nhân miễn phí</li>
                                                         <li>✔️ Áo choàng tắm, Két an toàn</li>
                                                         <li>✔️ Máy sấy tóc, Máy sấy quần áo</li>
@@ -327,13 +344,13 @@ export default function RoomsTable({ rooms, hotel_id }) {
 
                                     {/* Guest Info */}
                                     <div className="p-4 flex-1 border-r text-center">
-                                        <p className="text-2xl">👫</p>
-                                        <p className="text-sm text-gray-700">{item.guest_count} khách</p>
+                                        <p className="text-2xl flex justify-center items-center"><svg fill="#df7b31" height="24px" width="24px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 512.001 512.001" xmlSpace="preserve" stroke="#df7b31"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M156.683,411.479h-22.274v-19.652c0-8.907-7.246-16.153-16.153-16.153H82.367c-8.907,0-16.153,7.246-16.153,16.153v19.652 H43.941c-6.244,0-11.307,5.063-11.307,11.307v77.906c0,6.245,5.063,11.307,11.307,11.307h112.741 c6.244,0,11.307-5.063,11.307-11.307v-77.906C167.989,416.541,162.927,411.479,156.683,411.479z M116.845,411.479h-0.001H83.78 v-18.24h33.065V411.479z"></path> </g> </g> <g> <g> <circle cx="259.839" cy="42.141" r="42.141"></circle> </g> </g> <g> <g> <path d="M467.168,326.163h-9.066v-54.005h7.442c2.221,0,4.022-1.801,4.022-4.022v-13.406c0-2.221-1.801-4.022-4.022-4.022H412.71 c2.989-8.683-0.201-18.595-8.286-23.747l-41.732-26.595l-0.331-54.776c-0.133-26.399-21.718-47.876-48.118-47.876 c-11.299,0-97.821,0-109.159,0c-26.4,0-47.985,21.477-48.118,47.876l-0.751,149.38c-0.057,11.23,9.001,20.379,20.23,20.435 c0.036,0,0.07,0,0.104,0c11.181,0,20.275-9.037,20.331-20.23l0.751-149.38c0.011-2.166,1.772-3.913,3.936-3.908 c2.165,0.006,3.915,1.762,3.915,3.926l0.009,341.787c0,13.476,10.924,24.4,24.4,24.4c13.476,0,24.4-10.924,24.4-24.4V292.57 h10.534v195.029c0,13.476,10.924,24.4,24.4,24.4c13.476,0,24.4-10.924,24.4-24.4c0-318.415-0.432-143.909-0.443-341.647 c0-2.323,1.863-4.217,4.186-4.256c2.323-0.038,4.249,1.794,4.324,4.116c0,0,0,0.001,0,0.002l0.398,65.869 c0.041,6.903,3.582,13.314,9.405,17.024l45.98,29.302v10.125c0,2.221,1.801,4.022,4.022,4.022h7.442v54.005h-9.066 c-6.738,0-12.199,5.462-12.199,12.199v139.941c0,6.738,5.462,12.199,12.199,12.199h9.066v13.177c0,4.595,3.726,8.321,8.321,8.321 c4.595,0,8.321-3.726,8.321-8.321v-13.177h35.877v13.177c0,4.595,3.726,8.321,8.321,8.321c4.595,0,8.321-3.726,8.321-8.321 v-13.177h9.065c6.738,0,12.199-5.462,12.199-12.199v-139.94C479.366,331.624,473.906,326.163,467.168,326.163z M441.46,326.163 h-35.873v-54.005h35.873V326.163z"></path> </g> </g> </g></svg></p>
+                                        <p className="text-sm text-gray-700">{item.guest_count} Khách</p>
                                     </div>
 
                                     {/* Price */}
                                     <div className="p-4 flex-1 border-r">
-                                        <p className="text-lg font-bold text-gray-800">US${item.price_per_night}</p>
+                                        <p className="text-lg font-bold text-gray-800">VND {item.price_per_night}</p>
                                         <p className="text-sm text-gray-600">Đã bao gồm thuế và phí</p>
                                     </div>
                                     {/* Số lượng phòng */}
@@ -352,19 +369,33 @@ export default function RoomsTable({ rooms, hotel_id }) {
                                     }
                                     {/* Payment Options */}
                                     <div className="p-4 flex-1">
-                                        <h3 className="font-bold text-green-600 text-sm">Không cần thẻ tín dụng</h3>
-                                        <ul className="text-sm text-gray-700 mt-2 space-y-1">
-                                            <li>💸 Phí hủy: Toàn bộ tiền phòng</li>
-                                            <li>✔️ Không cần thanh toán trước - thanh toán tại chỗ nghỉ</li>
-                                        </ul>
+                                        {item.pay_rule == 0
+                                            ?
+                                            <>
+                                                <h3 className="font-bold text-green-600 text-sm">Không cần thanh toán luôn</h3>
+                                                <ul className="text-sm text-gray-700 mt-2 space-y-1">
+                                                    <li>💸 Phí hủy: Toàn bộ tiền phòng</li>
+                                                    <li>✔️ Không cần thanh toán trước - thanh toán tại chỗ nghỉ</li>
+                                                </ul>
+                                            </>
+                                            :
+                                            <>
+                                                <h3 className="font-bold text-red-600 text-sm">Cần thanh toán online</h3>
+                                                <ul className="text-sm text-gray-700 mt-2 space-y-1">
+                                                    <li>💸 Phí hủy: Toàn bộ tiền phòng</li>
+                                                    <li>✔️ Thanh toán đa dạng VNPAY, thẻ ngân hàng, thẻ tín dụng, ..</li>
+                                                </ul>
+                                            </>
+                                        }
                                         <div className="mt-4 flex justify-center">
                                             {isSearch &&
-                                                <button onClick={() => OrderRoom(index,item.room_id,item.hotel_id)} className="px-6 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700">
-                                                    Tôi sẽ đặt
+                                                <button onClick={() => OrderRoom(index, item.room_id)} className="px-6 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700">
+                                                    Tôi sẽ đặt 
                                                 </button>}
                                         </div>
                                     </div>
                                 </div>
+                            </>
 
                         ))
                             :
