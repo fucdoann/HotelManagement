@@ -7,14 +7,14 @@ export default function SignIn() {
           href="/login"
           className="px-7 py-3 text-base font-medium text-dark hover:text-blue-600 dark:text-white"
         >
-          Đăng ký
+          Đăng nhập
         </a>
 
         <a
           href="/register"
           className="py-3 text-base font-medium rounded-md bg-primary px-7 text-white hover:bg-blue-800 bg-blue-600 "
         >
-          Đăng nhập
+          Đăng ký
         </a>
       </div>
     )

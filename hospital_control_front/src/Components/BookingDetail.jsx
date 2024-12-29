@@ -226,7 +226,7 @@ const BookingDetails = () => {
 
         // Process the message data
         setDataPayment(event.data)
-        console.log(event.data)
+        // console.log(event.data)
     });
     return (
         <>  
@@ -426,7 +426,7 @@ const BookingDetails = () => {
                                 <strong>Nhận phòng:</strong> {formatTimestampToVietnamese(checkin)}<br />
                                 <strong>Trả phòng:</strong>{formatTimestampToVietnamese(checkout)}<br />
                                 <strong>Tổng cộng:</strong>{' '}
-                                <span className="text-green-600 font-semibold">US${prices}</span>
+                                <span className="text-green-600 font-semibold">VND {prices}</span>
                             </p>
                         </div>
 
@@ -442,11 +442,11 @@ const BookingDetails = () => {
                         <div className="border-t pt-4">
                             <h3 className="font-semibold">Chi phí hủy là bao nhiêu?</h3>
                             <p className="text-green-600 text-sm mt-1">
-                                Hủy miễn phí trước 18 tháng 12
+                            Trước {formatTimestampToVietnamese(checkin)}
                             </p>
                             <p className="text-gray-600 text-sm">
-                                Từ 00:00 ngày 18 tháng 12&nbsp;
-                                <span className="font-semibold">US$58</span>
+                                Từ 00:00 {formatTimestampToVietnamese(checkin)}&nbsp;
+                                <span className="font-semibold">100% tiền phòng</span>
                             </p>
                         </div>
 

@@ -1,5 +1,6 @@
 import { data } from 'autoprefixer';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const formatDate = (timestamp) => {
   const year = timestamp.slice(0, 4);
@@ -7,7 +8,7 @@ const formatDate = (timestamp) => {
   const day = timestamp.slice(6, 8);
   const hour = timestamp.slice(8, 10);
   const minute = timestamp.slice(10, 12);
-
+  const navigate = useNavigate();
   const formattedDate = `${day}/${month}/${year} ${hour}:${minute}`;
   return formattedDate
 }
@@ -52,13 +53,13 @@ const PaymentSuccess = ({ dataPayment }) => {
       <div className="mt-8 text-center gap-5 flex items-center justify-center">
         <button
           className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-300"
-          onClick={() => alert('Giao dịch đã được xác nhận!')}
+          onClick={() => navigate('/user/listbook')}
         >
           Xem phòng đã đặt
         </button>
         <button
           className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-300"
-          onClick={() => alert('Giao dịch đã được xác nhận!')}
+          onClick={() => () => navigate('/hotel')}
         >
           Tiếp tục đặt phòng
         </button>
