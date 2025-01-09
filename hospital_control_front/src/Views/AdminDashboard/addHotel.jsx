@@ -184,6 +184,7 @@ export function FormElements() {
     console.log(submitData);
     axios.post('/storeHotel', submitData).then(
       res => {
+        console.log(res);
         if (res.data.status == 200) {
           navigate('/admin/hotels');
         }

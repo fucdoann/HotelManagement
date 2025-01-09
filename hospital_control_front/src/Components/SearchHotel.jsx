@@ -340,16 +340,16 @@ export default function SearchHotel() {
             </div>
 
             {/* Partner Logos */}
-            <div className="flex items-center justify-center space-x-6 mt-6">
-                <img className="w-32" src="https://imgcy.trivago.com/image/upload/hardcodedimages/mpm-localised-logos-dark/626.png" alt="Booking.com" />
-                <img className="w-32" src="https://imgcy.trivago.com/image/upload/hardcodedimages/mpm-localised-logos-dark/406.png" alt="Expedia" />
-                <img className="w-32" src="https://imgcy.trivago.com/image/upload/hardcodedimages/mpm-localised-logos-dark/3340.png" alt="Hotels.com" />
-                <img className="w-32" src="https://imgcy.trivago.com/image/upload/hardcodedimages/mpm-localised-logos-dark/2564.png" alt="Vrbo" />
-                <img className="w-32" src="https://imgcy.trivago.com/image/upload/hardcodedimages/mpm-localised-logos-dark/14.png" alt="Accor" />
-                <img className="w-32" src="https://imgcy.trivago.com/image/upload/hardcodedimages/mpm-localised-logos-dark/634.png" alt="Trip.com" />
-                <img className="w-32" src="https://imgcy.trivago.com/image/upload/hardcodedimages/mpm-localised-logos-dark/54.png" alt="Priceline" />
-                <span className="text-gray-500">+100s more</span>
+            <div className="max-w-5xl mx-auto flex flex-wrap justify-center items-center mt-10 gap-6">
+        {["Khách sạn hàng đầu", "Ưu đãi đặc biệt", "Đánh giá cao", "Phù hợp ngân sách"].map((service) => (
+            <div
+                key={service}
+                className="bg-[#6AA0CE] text-white p-4 w-40 text-center rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-200"
+            >
+                <p className="text-sm font-bold text-white-800">{service}</p>
             </div>
+        ))}
+    </div>
         </div>
         </>
     );

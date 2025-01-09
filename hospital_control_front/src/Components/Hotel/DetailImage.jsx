@@ -36,7 +36,7 @@ const ImageSlider = ({ setOpenDetail, hotel, currentIndex, setCurrentIndex }) =>
                         <img
                             src={`${baseUrl}${images[currentIndex]}`}
                             alt={`Slide ${currentIndex + 1}`}
-                            className="w-full object-cover rounded-lg"
+                            className="w-full max-h-[500px]  object-cover rounded-lg"
                         />
                         {/* Navigation Buttons */}
                         <button
