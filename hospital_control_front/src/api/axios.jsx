@@ -2,7 +2,9 @@ import axios from "axios";
 const axiosClient = axios.create({
     baseURL: `${import.meta.env.VITE_API_URL}`,
     withCredentials: true, // For cookies, if using Sanctum
+    withXSRFToken: true,
 })
+
 // Add a request interceptor
 axiosClient.interceptors.request.use(
     (config) => {

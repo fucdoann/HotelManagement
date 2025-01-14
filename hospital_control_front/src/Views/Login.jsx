@@ -17,7 +17,7 @@ function Login() {
         res => {
             if(res.data.status_code == 201){
               setLoginFail(false)
-              console.log(res.data.access_token)
+              localStorage.setItem('token', res.data.access_token);
               window.location.href = '/'
             }
             else{

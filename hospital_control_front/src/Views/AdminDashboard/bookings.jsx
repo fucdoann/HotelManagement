@@ -41,12 +41,14 @@ const convertClass = (status) => {
 export function Bookings() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  const [showUserPopup, setShowUserPopup] = useState(false);
   const [message, setMessage] = useState('');
   const [index, setIndex] = useState(0);
   const [listBook, setListBook] = useState([]);
   const [countIndex, setCountIndex] = useState(10);
   const [querySearch, setQuerySearch] = useState('');
   const [deleteId, setDeleteId] = useState(0);
+  const [detailBooking, setDetailBooking] = useState({});
   const handleNext = () => {
     setIndex((prevIndex) => (prevIndex + 1) % Math.ceil(countIndex / 10));
   };
@@ -103,8 +105,60 @@ export function Bookings() {
         console.error(error);
       });
   }
+  const UserDetailPopup = ({ onClose }) => (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+        <h3 className="text-2xl font-bold mb-6 text-gray-800">
+          Chi tiết đơn đặt phòng
+        </h3>
+        <div className="space-y-4 text-gray-700">
+          <div>
+            <span className="font-semibold">Tên người đặt:</span>
+            <span className="ml-2">{detailBooking.name}</span>
+          </div>
+          <div>
+            <span className="font-semibold">Email người đặt:</span>
+            <span className="ml-2">{detailBooking.email}</span>
+          </div>
+          <div>
+            <span className="font-semibold">Điện thoại người đặt:</span>
+            <span className="ml-2">{detailBooking.phone}</span>
+          </div>
+          <div>
+            <span className="font-semibold">Ngày check-in:</span>
+            <span className="ml-2">{detailBooking.checkindate}</span>
+          </div>
+          <div>
+            <span className="font-semibold">Thời gian check-in:</span>
+            <span className="ml-2">{detailBooking.checkintime}</span>
+          </div>
+          <div>
+            <span className="font-semibold">Yêu cầu đặc biệt:</span>
+            <span className="ml-2">
+              {detailBooking.request || "Không có yêu cầu"}
+            </span>
+          </div>
+        </div>
+        <div className="mt-6 flex justify-end">
+          <button
+            className="px-6 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 focus:outline-none"
+            onClick={onClose}
+          >
+            Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+  
   return (
     <>
+     {showUserPopup && (
+        <UserDetailPopup
+          // user={userDetails}
+          onClose={() => setShowUserPopup(false)}
+        />
+      )}
       {showDelete && <ConfirmDelete setShowDelete={setShowDelete} deleteHotel={deleteBooking} deleteId={deleteId} type={"Đơn đặt phòng"} />}
       {showSuccess && <SuccessPop mess={message} onClose={() => setShowSuccess(false)} />}
       <div className="mt-12 mb-8 flex flex-col gap-12">
@@ -151,7 +205,14 @@ export function Bookings() {
                       {listBook.length > 0 &&
                         listBook.slice(index * 10, index * 10 + 10).map((item, i) => (
                           <tr key={i} className="hover:bg-gray-50 transition">
-                            <td className="px-5 py-4 border-b border-gray-200 text-sm text-center">
+                            <td onClick={() => {setDetailBooking(
+                              {'name' : item.user_name,
+                            'email' : item.user_email,
+                            'phone' :item.user_phone,
+                            'checkintime' : item.time_check_in,
+                            'request' : item.request,
+                          'checkindate' : convertTime2(parseInt(item.check_in_date))}
+                            );setShowUserPopup(true)}} className="px-5 py-4 border-b border-gray-200 text-sm text-center">
                               {item.booking_id}
                             </td>
                             <td className="px-5 py-4 border-b border-gray-200 text-sm">

@@ -14,7 +14,6 @@ export default function Register() {
 
     const onSubmit = handleSubmit((data) => {
         data['role'] = typeRegis
-        console.log(data)
         axios.post('/register', data).then(
             res => {
                 if (res.data.status == 200) {

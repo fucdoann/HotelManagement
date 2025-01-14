@@ -31,7 +31,7 @@ const Messages = ({ namePartner, messages, handleSendMessage, newMessage, setNew
             </div>
             <div className="w-full flex-grow bg-white dark:bg-gray-900 my-2 p-2 overflow-y-auto">
                 {messages.map((msg, index) => (
-                    msg.sender_id !==  userId ? <>
+                    msg.sender_id !== userId ? <>
                         <div key={index} className="flex items-end w-3/4" >
                             <img className=" w-8 h-8 m-3 rounded-full" src="../../../public/user.png" alt="avatar" />
                             <div className="p-3 bg-[#F0F0F0] dark:bg-gray-800 mx-3 my-1 rounded-2xl rounded-bl-none sm:w-3/4 md:w-3/6">
@@ -39,7 +39,7 @@ const Messages = ({ namePartner, messages, handleSendMessage, newMessage, setNew
                                     {msg.message}
                                 </div>
                                 <div className="text-xs text-gray-400">
-                                    Now
+                                    {msg.time_sent}
                                 </div>
                             </div>
                         </div>
@@ -49,7 +49,7 @@ const Messages = ({ namePartner, messages, handleSendMessage, newMessage, setNew
                                 <div className="flex items-end w-auto bg-[#0E75FF] dark:bg-gray-800 m-1 rounded-xl rounded-br-none sm:w-3/4 md:w-auto">
                                     <div className="p-2">
                                         <div className="text-gray-200">
-                                        {msg.message}
+                                            {msg.message}
                                         </div>
                                     </div>
                                 </div>
@@ -65,7 +65,11 @@ const Messages = ({ namePartner, messages, handleSendMessage, newMessage, setNew
                         </svg>
                     </div>
                     <div className="search-chat flex flex-grow p-2">
-                        <input value={newMessage} onChange={(e) => setNewMessage(e.target.value)} className="input text-gray-700 dark:text-gray-200 text-sm p-5 focus:outline-none bg-gray-100 dark:bg-gray-800  flex-grow rounded-l-md" type="text" placeholder="Type your message ..." />
+                        <input value={newMessage} onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                handleSendMessage();
+                            }
+                        }} onChange={(e) => setNewMessage(e.target.value)} className="input text-gray-700 dark:text-gray-200 text-sm p-5 focus:outline-none bg-gray-100 dark:bg-gray-800  flex-grow rounded-l-md" type="text" placeholder="Type your message ..." />
                         <div onClick={handleSendMessage} className="bg-gray-100 dark:bg-gray-800 dark:text-gray-200  flex justify-center items-center pr-3 text-gray-400 rounded-r-md">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />

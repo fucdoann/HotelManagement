@@ -8,11 +8,11 @@ const Conversation = ({ListCustomer, active, setActive, setNamePartner, setChatP
     return (
         <div className="p-1">
             {
-                ListCustomer.map((item, index) => (
+                ListCustomer.length >0 && ListCustomer.map((item, index) => (
                     <div onClick={() => {setActive(index); setNamePartner(item.user_name);setChatPartnerId(item.user_id)}}>
                         <ConversationItem
-                        message={'Click to see your message'}
-                        time={'Now'}
+                        message={item.last_message}
+                        time={item.last_message_time}
                         name={item.user_name}
                         active={ index == active ? true : false }
                     />
