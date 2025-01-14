@@ -3,7 +3,12 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { axios } from "../api/axios"
 
-const FilterSection = () => {
+const FilterSection = ({ hotelConve, filters, setFilters }) => {
+    const handleCheckboxChange = (key, value) => {
+        const updatedFilters = { ...filters, [key]: value };
+        setFilters(updatedFilters);
+        // console.log(updatedFilters)
+    };
     return (
         <div className="w-72 bg-white p-6 rounded-lg shadow-lg">
             <h3 className="text-2xl font-semibold mb-6 text-gray-800 border-b pb-4">
@@ -16,7 +21,9 @@ const FilterSection = () => {
                         <span className="material-icons text-blue-500 mr-2">Thanh toán</span>
                     </h4>
                     <label className="flex items-center space-x-2">
-                        <input type="checkbox" className="form-checkbox text-blue-600 rounded" />
+                        <input onChange={(e) =>
+                            handleCheckboxChange("pay_rule", e.target.checked ? 1 : 0)
+                        } type="checkbox" className="form-checkbox text-blue-600 rounded" />
                         <span>Thanh toán tại khách sạn</span>
                     </label>
                     <label className="flex items-center space-x-2 mt-2">
@@ -45,14 +52,20 @@ const FilterSection = () => {
                     <h4 className="text-lg font-medium text-gray-700 mb-2 flex items-center">
                         <span className="material-icons text-blue-600  mr-2">Tiện ích khác</span>
                     </h4>
-                    <label className="flex items-center space-x-2">
-                        <input type="checkbox" className="form-checkbox text-blue-600 rounded" />
-                        <span>Parking</span>
-                    </label>
-                    <label className="flex items-center space-x-2 mt-2">
-                        <input type="checkbox" className="form-checkbox text-blue-600  rounded" />
-                        <span>Free Wi-Fi</span>
-                    </label>
+                    {hotelConve && hotelConve.map((item, index) => (
+                        <label key={index} className="flex items-center space-x-2">
+                            <input onChange={(e) => {
+                                const selectedConveniences = e.target.checked
+                                    ? [...filters.conveniences, item.id]
+                                    : filters.conveniences.filter(
+                                        (id) => id !== item.id
+                                    );
+                                handleCheckboxChange("conveniences", selectedConveniences);
+                            }
+                            } type="checkbox" className="form-checkbox text-blue-600 rounded" />
+                            <span>{item.convenient_name}</span>
+                        </label>
+                    ))}
                 </div>
             </div>
         </div>
@@ -75,6 +88,12 @@ const ListSearchHotel = () => {
     const [checkout, setCheckout] = useState(queryParams.get('checkout') || '');
     const guest = children + adults; // Dynamically calculate the total guests
     const [hotels, setHotels] = useState([]);
+    const [hotelConve, setHotelConve] =useState([]);
+    const [filters, setFilters] = useState({
+        pay_rule: 0,
+        conveniences: [],
+    });
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -87,6 +106,7 @@ const ListSearchHotel = () => {
                     'province': province,
                     'guest_count': guest,
                     'rooms': rooms,
+                    'filters' : filters,
                 })
                 setHotels(response.data.data)
             }
@@ -94,12 +114,22 @@ const ListSearchHotel = () => {
                 console.error(error)
             }
         };
-
+        const fetchHotelConveniences = async () => {
+            try {
+                const response = await axios.post('/getFullConve');
+                setHotelConve(response.data.data);
+                // console.log(response.data.data)
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        fetchHotelConveniences();
         fetchData();
-    }, [province, district, commune, checkin, checkout, guest, rooms]);
+
+    }, [filters]);
     return (
         <div className="flex p-8 space-x-8 w-[75%] m-auto justify-center">
-            <FilterSection />
+            <FilterSection hotelConve={hotelConve} filters={filters} setFilters={setFilters} />
             <div className="w-[60%]">
                 {hotels ? (
                     hotels.map((hotel, index) => (

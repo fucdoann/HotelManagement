@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { axios } from '../../api/axios';
 import {
   Typography,
   Card,
@@ -18,35 +19,120 @@ import {
   ArrowUpIcon,
 } from "@heroicons/react/24/outline";
 import { StatisticsCard } from "../../Components/cards";
-import { StatisticsChart } from "../../Components/charts";
 import {
-  statisticsCardsData,
-  statisticsChartsData,
   projectsTableData,
   ordersOverviewData,
 } from "../../data";
+import {
+  BanknotesIcon,
+  UserPlusIcon,
+  UsersIcon,
+  ChartBarIcon,
+} from "@heroicons/react/24/solid";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
-
+import { ClassNames } from "@emotion/react";
 export function Home() {
+  const [statistics, setStatistics] = useState({
+    totalIncome: 0,
+    oldCustomers: 0,
+    newCustomers: 0,
+    totalBookings: 0,
+    percentIncom : 0,
+    percentBooking : 0,
+  });
+  const [listHotel,setListHotel] = useState({});
+  useEffect(() => {
+    // Fetch data when the component mounts
+    const fetchStatistics = async () => {
+      try {
+        const response = await axios.post('/getDashBoard'); // Replace with your endpoint
+        setStatistics({
+          totalIncome: response.data.total_payment_amount || 0,
+          oldCustomers: response.data.total_users_with_user_id || 0,
+          newCustomers: response.data.total_users_without_user_id || 0,
+          totalBookings: response.data.total_bookings || 0,
+          percentIncom: response.data.percentageChange || 0,
+          percentBooking: response.data.percentageChangeBooking || 0,
+        });
+      } catch (error) {
+        console.error("Failed to fetch statistics:", error);
+      }
+    };
+    const fetchHotels = () => {
+      axios.post('/getListHotelDashboard')
+        .then(res => {
+          setListHotel(res.data.data);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    };
+    fetchStatistics();
+    fetchHotels();
+  }, []);
   return (
     <div className="mt-12">
       <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
-        {statisticsCardsData.map(({ icon, title, footer, ...rest }) => (
-          <StatisticsCard
-            key={title}
-            {...rest}
-            title={title}
-            icon={React.createElement(icon, {
-              className: "w-6 h-6 text-white",
-            })}
-            footer={
-              <Typography className="font-normal text-blue-gray-600">
-                <strong className={footer.color}>{footer.value}</strong>
-                &nbsp;{footer.label}
-              </Typography>
-            }
-          />
-        ))}
+        <StatisticsCard
+          key={'Tổng thu nhập'}
+          title={'Tổng thu nhập'}
+          value={`${statistics.totalIncome}`}
+          color={"gray"}
+          icon={React.createElement(BanknotesIcon, {
+            className: "w-6 h-6 text-white",
+          })}
+          footer={
+            <Typography className="font-normal text-blue-gray-600">
+              <strong className={"text-green-500"}>{`+${statistics.percentIncom}%`}</strong>
+              &nbsp;{"so với tuần trước"}
+            </Typography>
+          }
+        />
+        <StatisticsCard
+          key={'Khách hàng cũ'}
+          title={'Khách hàng cũ'}
+          value={statistics.oldCustomers}
+          color={"gray"}
+          icon={React.createElement(UsersIcon, {
+            className: "w-6 h-6 text-white",
+          })}
+          footer={
+            <Typography className="font-normal text-blue-gray-600">
+              <strong className={"text-green-500"}>{"+55%"}</strong>
+              &nbsp;{"so với tháng trước"}
+            </Typography>
+          }
+        />
+        <StatisticsCard
+          key={'Khách hàng mới'}
+          title={'Khách hàng mới'}
+          value={statistics.newCustomers}
+          color={"gray"}
+          icon={React.createElement(UserPlusIcon, {
+            className: "w-6 h-6 text-white",
+          })}
+          footer={
+            <Typography className="font-normal text-blue-gray-600">
+              <strong className={"text-green-500"}>{"+55%"}</strong>
+              &nbsp;{"so với tháng trước"}
+            </Typography>
+          }
+        />
+        <StatisticsCard
+          key={'Tổng đơn đặt'}
+          title={'Tổng đơn đặt'}
+          value={statistics.totalBookings}
+          color={"gray"}
+          icon={React.createElement(ChartBarIcon, {
+            className: "w-6 h-6 text-white",
+          })}
+          footer={
+            <Typography className="font-normal text-blue-gray-600">
+              <strong className={"text-green-500"}>{`+${statistics.percentBooking}%`}</strong>
+              &nbsp;{"so với tuần trước"}
+            </Typography>
+          }
+        />
       </div>
       <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
         <Card className="overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm">
@@ -58,14 +144,14 @@ export function Home() {
           >
             <div>
               <Typography variant="h6" color="blue-gray" className="mb-1">
-                Projects
+                Khách sạn hoàn thiện
               </Typography>
               <Typography
                 variant="small"
                 className="flex items-center gap-1 font-normal text-blue-gray-600"
               >
                 <CheckCircleIcon strokeWidth={3} className="h-4 w-4 text-blue-gray-200" />
-                <strong>30 done</strong> this month
+                <strong>30 done</strong>
               </Typography>
             </div>
             <Menu placement="left-start">
@@ -85,11 +171,11 @@ export function Home() {
               </MenuList>
             </Menu>
           </CardHeader>
-          <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
+          <CardBody className=" px-0 pt-0 pb-2">
             <table className="w-full min-w-[640px] table-auto">
               <thead>
                 <tr>
-                  {["companies", "members", "budget", "completion"].map(
+                  {["Khách sạn", "Phòng", "Giá tối thiểu", "Hoàn thiện"].map(
                     (el) => (
                       <th
                         key={el}
@@ -107,49 +193,35 @@ export function Home() {
                 </tr>
               </thead>
               <tbody>
-                {projectsTableData.map(
-                  ({ img, name, members, budget, completion }, key) => {
-                    const className = `py-3 px-5 ${
-                      key === projectsTableData.length - 1
-                        ? ""
-                        : "border-b border-blue-gray-50"
-                    }`;
+                {listHotel.length > 0 && listHotel.map(
+                  (item, key) => {
+                    const className = `py-3 px-5 ${key === projectsTableData.length - 1
+                      ? ""
+                      : "border-b border-blue-gray-50"
+                      }`;
 
                     return (
-                      <tr key={name}>
+                      <tr key={key}>
                         <td className={className}>
                           <div className="flex items-center gap-4">
-                            <Avatar src={img} alt={name} size="sm" />
                             <Typography
                               variant="small"
                               color="blue-gray"
                               className="font-bold"
                             >
-                              {name}
+                              {item.name}
                             </Typography>
                           </div>
                         </td>
                         <td className={className}>
-                          {members.map(({ img, name }, key) => (
-                            <Tooltip key={name} content={name}>
-                              <Avatar
-                                src={img}
-                                alt={name}
-                                size="xs"
-                                variant="circular"
-                                className={`cursor-pointer border-2 border-white ${
-                                  key === 0 ? "" : "-ml-2.5"
-                                }`}
-                              />
-                            </Tooltip>
-                          ))}
+                          {item.room_count}
                         </td>
                         <td className={className}>
                           <Typography
                             variant="small"
                             className="text-xs font-medium text-blue-gray-600"
                           >
-                            {budget}
+                            {item.min_price}
                           </Typography>
                         </td>
                         <td className={className}>
@@ -158,12 +230,12 @@ export function Home() {
                               variant="small"
                               className="mb-1 block text-xs font-medium text-blue-gray-600"
                             >
-                              {completion}%
+                              {100}%
                             </Typography>
                             <Progress
-                              value={completion}
+                              value={100}
                               variant="gradient"
-                              color={completion === 100 ? "green" : "blue"}
+                              color={100 === 100 ? "green" : "blue"}
                               className="h-1"
                             />
                           </div>
@@ -202,11 +274,10 @@ export function Home() {
               ({ icon, color, title, description }, key) => (
                 <div key={title} className="flex items-start gap-4 py-3">
                   <div
-                    className={`relative p-1 after:absolute after:-bottom-6 after:left-2/4 after:w-0.5 after:-translate-x-2/4 after:bg-blue-gray-50 after:content-[''] ${
-                      key === ordersOverviewData.length - 1
-                        ? "after:h-0"
-                        : "after:h-4/6"
-                    }`}
+                    className={`relative p-1 after:absolute after:-bottom-6 after:left-2/4 after:w-0.5 after:-translate-x-2/4 after:bg-blue-gray-50 after:content-[''] ${key === ordersOverviewData.length - 1
+                      ? "after:h-0"
+                      : "after:h-4/6"
+                      }`}
                   >
                     {React.createElement(icon, {
                       className: `!w-5 !h-5 ${color}`,

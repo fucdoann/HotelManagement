@@ -13,8 +13,9 @@ import UserDasboard from './Views/User/UserDashboard'
 import ProtectedRoute from './ProtectedRoute'
 import ListBook from './Views/User/UserBookList'
 import ListPay from './Views/User/UserPayList'
+import UserChat from './Views/User/UserChat'
 // import {AdminLayout} from './Views/AdminDashboard'
-import { Home, Profile, Tables, Bookings, FormElements, Payments, EditHotel } from "./Views/AdminDashboard";
+import { Home, Profile, Tables, Bookings, FormElements, Payments, EditHotel, ChatAdmin } from "./Views/AdminDashboard";
 import { useAuth } from './Context/AuthProvider'
 import { AdminDashboard } from './layouts/dashboard'
 function App() {
@@ -42,6 +43,8 @@ function App() {
                         <Route path="payments" element={<Payments></Payments>}></Route>
                         <Route path="edithotel" element={<EditHotel />} />
                         <Route path="addhotel" element={<FormElements />} />
+                        <Route path="adminchat" element={<ChatAdmin />} />
+
                     </Route>
                 </Route>
                 {/* Hotel router */}
@@ -60,6 +63,7 @@ function App() {
                     <Route index element={<UserDasboard />} /> {/* Default child route */}
                     <Route path="listbook" element={<ListBook />} />
                     <Route path="listpay" element={<ListPay />} />
+                    <Route path="chatuser" element={<UserChat />} />
 
 
                 </Route>

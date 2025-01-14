@@ -21,10 +21,61 @@ import {
 import { Link } from "react-router-dom";
 import { ProfileInfoCard, MessageCard } from "../../Components/cards";
 import { platformSettingsData, conversationsData, projectsData } from "../../data";
+import { useState, useEffect } from "react";
+import { useAuth } from "../../Context/AuthProvider";
+import {axios} from '../../api/axios'
+import { useForm } from 'react-hook-form'
+import SuccessPop from "../../Components/PopUp/SuccessPop";
 
 export function Profile() {
+  const {
+    register,
+    formState: {errors},
+    handleSubmit,
+    setValue
+  } = useForm()
+  const { user } = useAuth();
+  const [name , setName] = useState(user.name || '');
+  const [email , setEmail] = useState(user.email || '');
+  const [phone , setPhone] = useState(user.user_phone || '');
+  const [update , setUpdate] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [listHotel, setListHotel] = useState({});
+  const baseUrl = import.meta.env.VITE_IMAGE_URL
+
+    const onSubmit = handleSubmit((data) => {
+      axios.post('/changeuser', data)
+      .then(res => {
+          if(res.data.status ===200){
+              setUpdate(true);
+              setIsEditing(false);
+
+          }
+      })
+      .catch(err => console.log(err))
+    })
+    const showForm = () => {
+      setValue("name", user.name || "");
+      setValue("email", user.email || "");
+      setValue("user_phone", user.user_phone || "");
+      setIsEditing(true);
+    }
+         useEffect(() => {
+            const fetchHotels = () => {
+                  axios.post('/getListHotelDashboard')
+                    .then(res => {
+                      setListHotel(res.data.data);
+                    })
+                    .catch(error => {
+                      console.error(error);
+                    });
+                };
+                fetchHotels();
+          },[])
   return (
     <>
+      {update && <SuccessPop mess="Cập nhập hồ sơ thành công" onClose={() => setUpdate(false)}/>}
+    
       <div className="relative mt-8 h-72 w-full overflow-hidden rounded-xl bg-[url('/img/background-image.png')] bg-cover	bg-center">
         <div className="absolute inset-0 h-full w-full bg-gray-900/75" />
       </div>
@@ -103,14 +154,80 @@ export function Profile() {
                
               </div>
             </div>
+            {isEditing ? (
+          <form onSubmit={e => e.preventDefault()} className="space-y-4">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                First Name
+              </label>
+              <input
+                onChange={(e) => setName(e.target.value)}
+                name="name"
+                {...register("name", { required: "First name is required" })}
+                className="mt-1 p-4 block w-full rounded border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                required=""
+              />
+              {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Mobile
+              </label>
+              <input
+                onChange={(e) => setPhone(e.target.value)}
+                {...register("user_phone", { required: "Mobile number is required" })}
+                className="mt-1 p-4 block w-full rounded border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              />
+              {errors.user_phone && <p className="text-red-500 text-sm">{errors.user_phone.message}</p>}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Email
+              </label>
+              <input
+                onChange={(e) => setEmail(e.target.value)}
+                {...register("email", { required: "Email is required" })}
+                className="mt-1 p-4  block w-full rounded border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              />
+              {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Location
+              </label>
+              <input
+                value={'Viet Nam'}
+                {...register("address", { required: "Location is required" })}
+                className="mt-1 p-4  block w-full rounded border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              />
+              {errors.address && <p className="text-red-500 text-sm">{errors.address.message}</p>}
+            </div>
+            <div className="flex justify-end space-x-2">
+              <button
+                type="button"
+                onClick={() => setIsEditing(false)}
+                className="px-4 py-2 text-sm text-gray-600 bg-gray-200 rounded shadow-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={onSubmit}
+                className="px-4 py-2 text-sm text-white bg-[#616161] rounded shadow-sm"
+              >
+                Save
+              </button>
+            </div>
+          </form>
+        ) : (
+          <>
             <ProfileInfoCard
               title="Profile Information"
-              description="Hi, I'm Alec Thompson, Decisions: If you can't decide, the answer is no. If two equally difficult paths, choose the one more painful in the short term (pain avoidance is creating an illusion of equality)."
+              description="Chào bạn, đây là trang thông tin cá nhân của admin. Bạn có thể bấm vào biểu tượng chỉnh sửa để chỉnh sửa thông tin và bấm SAVE để hoàn thiện"
               details={{
-                "first name": "Alec M. Thompson",
-                mobile: "(44) 123 1234 123",
-                email: "alecthompson@mail.com",
-                location: "USA",
+                "name": `${name}`,
+                mobile: `${phone}`,
+                email: `${email}`,
+                location: "Viet Nam",
                 social: (
                   <div className="flex items-center gap-4">
                     <i className="fa-brands fa-facebook text-blue-700" />
@@ -121,10 +238,12 @@ export function Profile() {
               }}
               action={
                 <Tooltip content="Edit Profile">
-                  <PencilIcon className="h-4 w-4 cursor-pointer text-blue-gray-500" />
+                  <PencilIcon onClick={showForm}  className="h-4 w-4 cursor-pointer text-blue-gray-500" />
                 </Tooltip>
               }
             />
+            </>
+        )}
             <div>
               <Typography variant="h6" color="blue-gray" className="mb-3">
                 Tin nhắn với người đặt
@@ -155,17 +274,17 @@ export function Profile() {
               Khách sạn nổi bật
             </Typography>
             <div className="mt-6 grid grid-cols-1 gap-12 md:grid-cols-2 xl:grid-cols-4">
-              {projectsData.map(
-                ({ img, title, description, tag, route, members }) => (
-                  <Card key={title} color="transparent" shadow={false}>
+              {listHotel.length > 0 && listHotel.slice(0,4).map(
+                (item, key) => (
+                  <Card key={key} color="transparent" shadow={false}>
                     <CardHeader
                       floated={false}
                       color="gray"
                       className="mx-0 mt-0 mb-4 h-64 xl:h-40"
                     >
                       <img
-                        src={img}
-                        alt={title}
+                        src={`${item.images.length ? baseUrl + item.images[0] : 'https://as2.ftcdn.net/v2/jpg/07/91/22/59/1000_F_791225927_caRPPH99D6D1iFonkCRmCGzkJPf36QDw.jpg'}`}
+                        alt={item.name}
                         className="h-full w-full object-cover"
                       />
                     </CardHeader>
@@ -174,24 +293,24 @@ export function Profile() {
                         variant="small"
                         className="font-normal text-blue-gray-500"
                       >
-                        {tag}
+                        #Project{key+1}
                       </Typography>
                       <Typography
                         variant="h5"
                         color="blue-gray"
                         className="mt-1 mb-2"
                       >
-                        {title}
+                        {item.name}
                       </Typography>
                       <Typography
                         variant="small"
                         className="font-normal text-blue-gray-500"
                       >
-                        {description}
+                        {item.description.length > 40 ? item.description.substring(0, 40) + "..." : item.description}
                       </Typography>
                     </CardBody>
                     <CardFooter className="mt-6 flex items-center justify-between py-0 px-1">
-                      <Link to={route}>
+                      <Link to={'/'}>
                         <Button variant="outlined" size="sm">
                           view project
                         </Button>

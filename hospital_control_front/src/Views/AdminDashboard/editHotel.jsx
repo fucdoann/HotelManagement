@@ -94,7 +94,7 @@ export function EditHotel() {
                         area: dataRoom[0].area,
                         view_room: dataRoom[0].view_room,
                         room_count: dataRoom[0].room_count,
-                        room_count: dataRoom[0].room_rule,
+                        room_rule: dataRoom[0].room_rule,
                         convenient: dataRoom[0].convenient ? dataRoom[0].convenient.join("\n") : "",
 
                     });

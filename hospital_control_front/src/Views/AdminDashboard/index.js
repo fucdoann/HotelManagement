@@ -5,4 +5,4 @@ export * from "./bookings";
 export * from "./addHotel";
 export * from "./editHotel";
 export * from "./payments";
-
+export * from "./Chat";

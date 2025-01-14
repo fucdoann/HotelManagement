@@ -58,7 +58,7 @@ export function Bookings() {
   };
   // Function to fetch bookings
   const fetchHotels = () => {
-    axios.post('/getListBooking', { querySearch })
+    axios.post('/getListBookingAdmin', { querySearch })
       .then(res => {
         setListBook(res.data.data);
         setCountIndex(res.data.data.length);

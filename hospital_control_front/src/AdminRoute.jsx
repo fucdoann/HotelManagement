@@ -6,7 +6,7 @@ import {
   ServerStackIcon,
   RectangleStackIcon,
 } from "@heroicons/react/24/solid";
-import { Home, Profile, Tables, Bookings,FormElements,Payments } from "./Views/AdminDashboard";
+import { Home, Profile, Tables, Bookings,FormElements,Payments,ChatAdmin } from "./Views/AdminDashboard";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -51,6 +51,12 @@ export const routes = [
         name: "Thêm khách sạn",
         path: "/addHotel",
         element: <FormElements />,
+      },
+      {
+        icon: <UserCircleIcon {...icon} />,
+        name: "Chat với khách hàng",
+        path: "/adminchat",
+        element: <ChatAdmin/>,
       },
     ],
   },
